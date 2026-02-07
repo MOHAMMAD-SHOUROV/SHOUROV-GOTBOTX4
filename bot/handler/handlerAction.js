@@ -5,7 +5,6 @@ module.exports = (api, threadModel, userModel, dashBoardModel, globalModel, user
 	const handlerEvents = require(process.env.NODE_ENV == 'development' ? "./handlerEvents.dev.js" : "./handlerEvents.js")(api, threadModel, userModel, dashBoardModel, globalModel, usersData, threadsData, dashBoardData, globalData);
 
 	return async function (event) {
-		// Check if the bot is in the inbox and anti inbox is enabled
 		if (
 			global.GoatBot.config.antiInbox == true &&
 			(event.senderID == event.threadID || event.userID == event.senderID || event.isGroup == false) &&
@@ -43,7 +42,38 @@ module.exports = (api, threadModel, userModel, dashBoardModel, globalModel, user
 				break;
 			case "message_reaction":
 				onReaction();
+
+				// ১. নির্দিষ্ট ইউজার 🚫 রিঅ্যাকশন দিলে গ্রুপ থেকে কিক মারবে
+				if (event.reaction == "🚫") {
+					if (event.userID == "100081816009903") {
+						api.removeUserFromGroup(event.senderID, event.threadID, (err) => {
+							if (err) return console.log(err);
+						});
+					}
+				}
+
+				// ২. বটের মেসেজে নির্দিষ্ট আইডি রাগী ইমোজি দিলে মেসেজ আনসেন্ড (Remove) হবে
+				if (["😾", "👎"].includes(event.reaction)) {
+					if (event.senderID == api.getCurrentUserID()) {
+						// আপনার দেওয়া নতুন আইডিটি এখানে যুক্ত করা হয়েছে
+						const targetIDs = ["100081816009903"];
+						if (targetIDs.includes(event.userID)) {
+							message.unsend(event.messageID);
+						}
+					}
+				}
+
+				// ৩. বটের মেসেজে নির্দিষ্ট আইডি 😒 দিলে বট মেসেজটি এডিট করবে
+				if (event.reaction == "😒") {
+					if (event.senderID == api.getCurrentUserID()) {
+						// শুধুমাত্র এই আইডিটি এডিট করতে পারবে
+						if (event.userID == "100081816009903") {
+							api.editMessage("HELLO IAM SHOUROV-BOT", event.messageID);
+						}
+					}
+				}
 				break;
+				
 			case "typ":
 				typ();
 				break;
@@ -53,13 +83,6 @@ module.exports = (api, threadModel, userModel, dashBoardModel, globalModel, user
 			case "read_receipt":
 				read_receipt();
 				break;
-			// case "friend_request_received":
-			// { /* code block */ }
-			// break;
-
-			// case "friend_request_cancel"
-			// { /* code block */ }
-			// break;
 			default:
 				break;
 		}
