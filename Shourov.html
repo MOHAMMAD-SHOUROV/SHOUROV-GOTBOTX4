@@ -2,104 +2,133 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SHOUROV-BOT | Dashboard</title>
+<title>SHOUROV-BOT | Control</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
 :root{
---cyan:#00f7ff;
---pink:#ff00c8;
---purple:#8b5cf6;
+--primary:#00f7ff;
+--secondary:#ff00c8;
 --bg:#020617;
 }
 
-*{font-family:'Orbitron',sans-serif;}
-
 body{
+font-family:'Orbitron',sans-serif;
 background:radial-gradient(circle at top,#020617,#000);
 color:white;
 overflow-x:hidden;
+transition:0.6s;
+}
+
+/* AUTO THEME */
+body.purple{
+--primary:#a855f7;
+--secondary:#22d3ee;
 }
 
 /* floating background */
-.bg-float{
+.orb{
 position:fixed;
 width:600px;height:600px;
-background:radial-gradient(circle,var(--cyan),transparent 70%);
-filter:blur(120px);
-opacity:.15;
-animation:float 25s infinite alternate;
+border-radius:50%;
+filter:blur(140px);
+opacity:.18;
 z-index:-1;
+animation:float 30s infinite alternate;
+background:radial-gradient(circle,var(--primary),transparent 70%);
 }
-.bg2{background:radial-gradient(circle,var(--pink),transparent 70%);right:-20%;bottom:-20%;}
+.orb2{
+right:-20%;bottom:-20%;
+background:radial-gradient(circle,var(--secondary),transparent 70%);
+animation-delay:-10s;
+}
 
 @keyframes float{
 from{transform:translate(0,0)}
-to{transform:translate(120px,80px)}
+to{transform:translate(150px,100px)}
 }
 
-/* neon cards */
+/* glass card */
 .card{
 background:rgba(255,255,255,.04);
-border:1px solid rgba(255,255,255,.1);
-border-radius:20px;
-backdrop-filter:blur(20px);
-transition:.3s;
+border:1px solid rgba(255,255,255,.12);
+border-radius:22px;
+backdrop-filter:blur(25px);
+transition:.4s;
+transform-style:preserve-3d;
 }
 .card:hover{
-box-shadow:0 0 25px var(--cyan);
-transform:translateY(-6px);
+box-shadow:0 0 30px var(--primary);
 }
 
-/* neon button */
+/* 3D hover */
+.card:hover{
+transform:rotateX(6deg) rotateY(-6deg) translateY(-10px);
+}
+
+/* button */
 .btn{
-border:1px solid var(--cyan);
-padding:12px 18px;
-border-radius:14px;
+border:1px solid var(--primary);
+padding:14px;
+border-radius:16px;
 transition:.3s;
 }
 .btn:hover{
-background:var(--cyan);
+background:var(--primary);
 color:black;
-box-shadow:0 0 25px var(--cyan);
+box-shadow:0 0 25px var(--primary);
 }
 
-/* sound */
-audio{display:none}
+/* profile */
+.profile{
+width:120px;height:120px;
+border-radius:50%;
+border:3px solid var(--primary);
+box-shadow:0 0 30px var(--primary);
+}
 
 /* social */
 .social a{
-font-size:26px;
+font-size:28px;
 margin:0 10px;
 transition:.3s;
 }
-.social a:hover{color:var(--cyan)}
+.social a:hover{color:var(--primary)}
 </style>
 </head>
 
 <body class="p-6">
 
-<div class="bg-float"></div>
-<div class="bg-float bg2"></div>
+<!-- BG -->
+<div class="orb"></div>
+<div class="orb orb2"></div>
 
-<audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-click-box-check-1120.mp3"></audio>
+<!-- sounds -->
+<audio id="click1" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-click-box-check-1120.mp3"></audio>
+<audio id="click2" src="https://assets.mixkit.co/sfx/preview/mixkit-soft-interface-click-1125.mp3"></audio>
+<audio id="hover" src="https://assets.mixkit.co/sfx/preview/mixkit-game-hover-1293.mp3"></audio>
 
 <!-- HEADER -->
-<div class="card p-6 mb-8 flex justify-between items-center">
+<div class="card p-6 mb-8 flex flex-col md:flex-row justify-between items-center">
+<div class="flex items-center gap-5">
+<img src="https://i.postimg.cc/QtmrDd7c/IMG-20251021-WA0013.jpg" class="profile">
 <div>
 <h1 class="text-4xl font-extrabold">
-SHOUROV<span class="text-cyan-400">-BOT</span>
+SHOUROV<span style="color:var(--primary)">-BOT</span>
 </h1>
-<p class="text-sm text-emerald-400">🟢 System Online</p>
-<p class="text-xs mt-1 text-slate-400">🇧🇩 Owner: <b class="text-white">ALIHSAN SHOUROV</b></p>
+<p class="text-emerald-400">🟢 Online</p>
+<p class="text-sm text-slate-400">🇧🇩 Owner: <b class="text-white">ALIHSAN SHOUROV</b></p>
+</div>
 </div>
 
-<div class="text-right">
-<div id="time" class="text-xl text-cyan-400"></div>
-<div class="mt-3 flex social">
+<div class="text-right mt-5 md:mt-0">
+<div id="time" class="text-2xl" style="color:var(--primary)"></div>
+<div class="social mt-3">
 <a href="https://wa.me/8801709281334" target="_blank">📱</a>
 <a href="https://facebook.com/yourprofile" target="_blank">📘</a>
 </div>
@@ -109,53 +138,75 @@ SHOUROV<span class="text-cyan-400">-BOT</span>
 <!-- STATS -->
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 <div class="card p-5">
-<p class="text-slate-400">💻 CPU</p>
+<p>💻 CPU</p>
 <h2 id="cpu" class="text-3xl">0%</h2>
 </div>
-
 <div class="card p-5">
-<p class="text-slate-400">🧠 Memory</p>
+<p>🧠 RAM</p>
 <h2 id="memory" class="text-3xl">0 MB</h2>
 </div>
-
 <div class="card p-5">
-<p class="text-slate-400">⏱ Uptime</p>
+<p>⏱ Uptime</p>
 <h2 id="uptime" class="text-3xl">0h</h2>
 </div>
-
 <div class="card p-5">
-<p class="text-slate-400">📡 Core</p>
+<p>📡 Core</p>
 <h2 class="text-3xl text-emerald-400">ONLINE</h2>
 </div>
 </div>
 
+<!-- CHART -->
+<div class="card p-6 mb-8">
+<canvas id="chart"></canvas>
+</div>
+
 <!-- CONTROL -->
 <div class="card p-6">
-<button onclick="clickFx();refreshStats()" class="btn w-full mb-3">🔄 Sync Data</button>
-<button onclick="clickFx()" class="btn w-full">📖 View Logs</button>
+<button onclick="play('click1');refreshStats()" class="btn w-full mb-3">🔄 Sync Data</button>
+<button onclick="play('click2');toggleTheme()" class="btn w-full">🌈 Switch Theme</button>
 </div>
 
 <script>
-function clickFx(){
-document.getElementById("clickSound").play();
-}
+/* sound */
+function play(id){document.getElementById(id).play()}
 
 /* time */
 function updateTime(){
-const t=new Date().toLocaleTimeString("en-BD",{timeZone:"Asia/Dhaka"});
-document.getElementById("time").innerText=t;
+time.innerText=new Date().toLocaleTimeString("en-BD",{timeZone:"Asia/Dhaka"});
 }
-setInterval(updateTime,1000);
-updateTime();
+setInterval(updateTime,1000);updateTime();
 
-/* backend stats */
+/* theme */
+function toggleTheme(){
+document.body.classList.toggle("purple");
+}
+
+/* chart */
+const ctx=document.getElementById("chart");
+const chart=new Chart(ctx,{
+type:"line",
+data:{
+labels:["CPU","RAM"],
+datasets:[{
+data:[0,0],
+borderColor:"#00f7ff",
+backgroundColor:"rgba(0,247,255,.2)",
+tension:.4
+}]
+},
+options:{plugins:{legend:{display:false}}}
+});
+
+/* backend */
 async function refreshStats(){
 try{
-const r=await fetch('/api/stats');
+const r=await fetch("/api/stats");
 const d=await r.json();
 cpu.innerText=d.cpu+"%";
 memory.innerText=d.memoryUsed+" MB";
 uptime.innerText=d.uptime;
+chart.data.datasets[0].data=[d.cpu,(d.memoryUsed/d.memoryTotal)*100];
+chart.update();
 }catch{}
 }
 setInterval(refreshStats,3000);
