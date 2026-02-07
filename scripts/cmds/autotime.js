@@ -1,92 +1,179 @@
+const moment = require("moment-timezone");
 const axios = require("axios");
 
 module.exports.config = {
   name: "autotime",
-  version: "1.1.1",
+  version: "2.1.0",
   role: 0,
-  author: "Alihsan Shourov",
-  description: "Auto time on/off system (group wise)",
-  category: "Auto",
-  usages: "autotime on | autotime off",
-  cooldowns: 3
+  author: "MR᭄﹅ MAHABUB﹅ メꪜ + Fix by ChatGPT",
+  description: "Auto time with on/off & video",
+  category: "AutoTime",
+  countDown: 3
 };
 
-// ======================
-// ON / OFF COMMAND
-// ======================
-module.exports.onStart = async function ({ api, event, args }) {
-  const threadID = event.threadID;
+/* ================= VIDEO LIST ================= */
+const VIDEO_LIST = [
+  "https://files.catbox.moe/2t76v9.mp4",
+  "https://files.catbox.moe/bzbs8p.mp4",
+  "https://files.catbox.moe/wsx6is.mp4",
+  "https://files.catbox.moe/fezghq.mp4",
+  "https://files.catbox.moe/67hscm.mp4",
+  "https://files.catbox.moe/7adomy.mp4",
+  "https://files.catbox.moe/drvdqx.mp4",
+  "https://files.catbox.moe/bswirx.mp4",
+  "https://files.catbox.moe/zuqiy8.mp4",
+  "https://files.catbox.moe/g9rlfi.mp4",
+  "https://files.catbox.moe/gi8zcg.mp4",
+  "https://files.catbox.moe/v3fe33.mp4",
+  "https://files.catbox.moe/mztrnl.mp4",
+  "https://files.catbox.moe/l4el1b.mp4",
+  "https://files.catbox.moe/b1o090.mp4",
+  "https://files.catbox.moe/99xtk5.mp4",
+  "https://files.catbox.moe/axup1b.mp4",
+  "https://files.catbox.moe/2dqwbl.mp4",
+  "https://files.catbox.moe/bhpehz.mp4",
+  "https://files.catbox.moe/bs5c9g.mp4",
+  "https://files.catbox.moe/niafel.mp4",
+  "https://files.catbox.moe/bggjju.mp4",
+  "https://files.catbox.moe/1d9xsl.mp4"
+];
 
-  if (!global.autotimeStatus) global.autotimeStatus = {};
+const getRandomVideo = async () => {
+  const url = VIDEO_LIST[Math.floor(Math.random() * VIDEO_LIST.length)];
+  const res = await axios.get(url, { responseType: "stream" });
+  return res.data;
+};
 
-  if (args[0] === "off") {
-    global.autotimeStatus[threadID] = false;
-    return api.sendMessage(
-      "❌ AutoTime এই group এ OFF করা হয়েছে",
-      threadID
-    );
-  }
+/* ================= ON / OFF COMMAND ================= */
+module.exports.onStart = async ({ event, message }) => {
+  const { threadID, body } = event;
+  if (!body) return;
 
-  if (args[0] === "on") {
-    global.autotimeStatus[threadID] = true;
-    return api.sendMessage(
-      "✅ AutoTime এই group এ ON করা হয়েছে",
-      threadID
-    );
-  }
+  const args = body.split(" ");
+  if (!["on", "off"].includes(args[1])) return;
 
-  return api.sendMessage(
-    "ব্যবহার করুন:\n• autotime on\n• autotime off",
-    threadID
+  const data = await global.db.allThreadData.find(t => t.threadID == threadID);
+  if (!data.data) data.data = {};
+
+  data.data.autoTime = args[1] === "on";
+
+  await message.reply(
+    `✅ AutoTime has been ${args[1].toUpperCase()} for this group.`
   );
 };
 
-// ======================
-// AUTO TIME SYSTEM
-// ======================
-module.exports.onLoad = async function ({ api }) {
+/* ================= AUTO TIME CORE ================= */
+module.exports.onLoad = async ({ api }) => {
 
-  if (!global.autotimeStatus) global.autotimeStatus = {};
+  const TIME_DATA = { 
+   "12:00:00 AM": {
+  'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟏𝟐:𝟎𝟎 𝐀𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\nঘুমাও মানুষ টা তুমার না__||😊😅\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "01:00:00 AM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟏:𝟎𝟎 𝐀𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n___এই শহরে এত কিছু হয়শুধু আমার মৃত্যু হয় না.!>🥺\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "02:00:00 AM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟐:𝟎𝟎 𝐀𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n_____💥🦋''হটাৎ কোন একদিন অজান্তে অন্ধকার এ হারিয়ে যাবো..!!>3🥀\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "03:00:00 AM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟑:𝟎𝟎 𝐀𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\nদুঃখ- আমায় ভালোবাসে.!!>😅\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "04:00:00 AM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟒:𝟎𝟎 𝐀𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n-••🌻🦋🤍বয়স বাড়বে, হারানোর তালিকা দীর্ঘ হবে, যাদের সাথে থাকার কথা ছিলো তারাও হারিয়ে যাবে..!!🦋🌼\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "04:30:00 AM": {
+      'message': "╭──────────────────╮\n  🌸𝐄𝐯𝐞𝐫𝐲 𝐌𝐮𝐬𝐥𝐢𝐦𝐬 𝐈𝐝𝐞𝐧𝐭𝐢𝐭𝐲 🌸\n╰──────────────────╯\n\n𝙽𝚊𝚖𝚎                     : 𝐌𝐮𝐬𝐥𝐢𝐦.\n𝙵𝚊𝚝𝚑𝚎𝚛•𝚜 𝙽𝚊𝚖𝚎    : 𝐀𝐝𝐨𝐦 (আ:)\n𝙲𝚛𝚎𝚊𝚝𝚘𝚛               : 𝐀𝐥𝐥𝐚𝐡\n𝙸𝚍𝚎𝚊𝚕                   : 𝐌𝐮𝐡𝐚𝐦𝐦𝐚𝐝 (সা.) \n𝙷𝚘𝚕𝚢 𝙱𝚘𝚘𝚔           : 𝐐𝐮𝐫𝐚𝐧 \n𝚁𝚎𝚕𝚒𝚐𝚒𝚘𝚗            : 𝐈𝐬𝐥𝐚𝐦 \n𝙸𝚍𝚎𝚗𝚝𝚒𝚝𝚢            : لَا إِلٰهَ إِلَّا الله مُحَمَّدٌ رَسُولُ الله• \n𝙷𝚘𝚋𝚋𝚒𝚎𝚜               : 𝐍𝐚𝐦𝐚𝐳 𝟓 𝐭𝐢𝐦𝐞𝐬 𝐚 𝐝𝐚𝐲 \n𝙿𝚛𝚎𝚜𝚎𝚗𝚝 𝙰𝚍𝚍𝚛𝚎𝚜𝚜           : 𝐃𝐮𝐧𝐢𝐲𝐚 \n𝙿𝚎𝚛𝚖𝚊𝚗𝚎𝚗𝚝 𝙰𝚍𝚍𝚛𝚎𝚜𝚜      : 𝐉𝐚𝐧𝐧𝐚𝐭 (𝐈𝐧 𝐬𝐡𝐚 𝐚𝐥𝐥𝐚𝐡)"
+    },
+    "05:00:00 AM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟓:𝟎𝟎 𝐀𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n__💜🔐🌈 __\n\n🐰!<— ❝“যে ইচ্ছেগুলো কখনোই পূরন হবার না মনটা সবসময় সেটা নিয়েই পড়ে থাকে” ❞ -!!-) 🙃🥀🌻\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "06:00:00 AM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟔:𝟎𝟎 𝐀𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\_🌸🖤  -𝗣𝗲𝗼𝗽𝗹𝗲 𝗟𝗼𝘀𝘁 𝗜𝗻 𝗘𝘅𝘁𝗿𝗲𝗺𝗲 𝗣𝗿𝗶𝗱𝗲 𝗡𝗲𝘃𝗲𝗿 𝗖𝗼𝗺𝗲 𝗕𝗮𝗰𝗸-!!🙂🐰\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "07:00:00 AM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟕:𝟎𝟎 𝐀𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n𝐎𝐧𝐞 𝐃𝐚𝐲...☺️\n           ___ღ𝐈𝐧 𝐬𝐡𝐚 𝐀𝐥𝐥𝐚𝐡..😊🖤\n_একদিন আমার মৃত্যুর  খবর শুনে সবাই মুচকি হেসে বলবে...!💔\n_ইন্না-লিল্লাহি ওয়া ইন্না ইলাইহির রাজিউন.!🙂\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "08:00:00 AM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟖:𝟎𝟎 𝐀𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\-“🐰♡︎𝗕𝗲✨🍥𝗠𝗶𝗻𝗲-!<😻🍭\n\n-!🧚‍♀️𝗜🐼-𝗪𝗶𝗹𝗹✨🍒𝗸𝗲𝗲𝗽😽𝘆𝗼𝘂-🧸💜-𝗙𝗼𝗿𝗲𝘃𝗲𝗿:)🌈\n\n🍒তুমি আমার সাধ্যের বাহিরে চাওয়া এক সুন্দর মানুষ।।🙂💔🥀\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "09:00:00 AM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟗:𝟎𝟎 𝐀𝐌 🩷«—•\n \n✢━━━━━━━━━━━━━━━✢\n\n°🐹💙_𝗧𝗿𝘂𝘀𝘁 M𝗲 🔐\n\n  - 𝗜 𝗮𝗹𝘄𝗮𝘆𝘀 𝗯𝗲𝗹𝗶𝗲𝘃𝗲 𝘁𝗵𝗮𝘁)🐰\n\n__!!>☁️✨🌻''--ভালোবাসি বলেই কি পেতে হবে,,!!🥀\n\n --থাকুক না কিছু ভালোবাসা অপূর্ণ..!!🖤💜🙂💫 ✨\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "10:00:00 AM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟏𝟎:𝟎𝟎 𝐀𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n—-༄༎🖤༎ྂ•——༄༎•গল্পটা তখনই ভালো ছিলো 😊🌸\n\nযখন তুমি ছিলে অপরিচিত আর আমি ছিলাম আমার আমিতে সীমাবদ্ধ༄༎•🙂🖤🦋\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "11:00:00 AM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟏𝟏:𝟎𝟎 𝐀𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n_____🐰💫🤍\n\n♡︎– আমার পূর্ণতায়; তাকেই পাশে রাখবো; যে আমার শূন্যতায়; পাশে ছিলো !-🌻🖤\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "12:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟏𝟐:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n -(🐰✨𝗜 𝗟𝗼𝘃𝗲 𝗨<33 𝗦𝘂𝗰𝗵 𝗔𝗻 𝗨𝗴𝗹𝘆 𝗪𝗼𝗿𝗱✨🦋-!                                  -!^𝗜𝘁 𝗦𝗵𝗼𝘂𝗹𝗱 𝗕𝗲!ᵉ\n\n_🔐💜💫_একরাশ উচ্ছ্বাসের মাঝে আমার;হটাৎ থেমে যাওয়ার কারণ তুমি..!..>!🌸🌼\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "01:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟏:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n_সর্বহারা পথিকের ছন্নছাড়া অস্তিত্ব 😅\n_ মাতোয়ারা পথকষ্টের হতচ্ছাড়া একাকিত্ব 🖤🌺\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "02:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟐:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n𝗟𝗶𝗳𝗲 𝗶𝘀 𝗯𝗲𝗮𝘂𝘁𝗶𝗳𝘂𝗹 𝗶𝗳 𝘆𝗼𝘂 𝗗𝗼𝗻𝘁 𝗙𝗮𝗹𝗹 𝗶𝗻 𝗟𝗼𝘃𝗲 \n\n♡︎_জীবন সুন্দর যদি কারো মায়ায় না পড়ো -🙂💔\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "03:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟑:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n_ 𝗣𝗲𝗵𝗹𝗶 𝗡𝗮𝘇𝗮𝗿 𝗠𝗮𝗶𝗻 𝗞𝗮𝗶𝗦𝗔 𝗝𝗔𝗱𝘂 𝗞𝗮𝗿 𝗗𝗶𝘆𝗔 🫶👀✨\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "04:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟒:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n━𝙈𝙮 𝘿𝙧𝙚𝙖𝙢𝙨 𝘿𝙤 𝙣𝙤𝙩 𝘾𝙤𝙢𝙚🌸\n       𝙩𝙧𝙪𝙚 𝙡𝙣 𝙡𝙢𝙖𝙜𝙞𝙣𝙖𝙩𝙞𝙤𝙣__🌼\n\n❥༊আমার༊স্বপ্নগুলো༊তো༊কল্পনাতেই ভালো༊মানায়༊বাস্তবে༊না༉彡🌺🙂\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "05:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟓:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\n🍒---আমি সেই গল্পের বই-🙂 -যে বই সবাই পড়তে পারলেও-😌 -অর্থ বোঝার ক্ষমতা কারো নেই..!☺️🥀💔\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "06:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟔:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\nএখন সন্ধ্যা ৬টা বাজে মাগরিবের আযান দিলে সবাই নামাজ পড়ে নাও🥀 নামাজ পড়ে বাড়িতে এসে কিছু খেয়ে নাও এবং পরিবারের সাথে সময় কাটাও😍\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "06:30:00 PM": {
+      'message': "╭──────────────────╮\n  🌸 𝐄𝐯𝐞𝐫𝐲 𝐌𝐮𝐬𝐥𝐢𝐦𝐬 𝐈𝐝𝐞𝐧𝐭𝐢𝐭𝐲 🌸\n╰──────────────────╯\n\n𝙽𝚊𝚖𝚎                     : 𝐌𝐮𝐬𝐥𝐢𝐦.\n𝙵𝚊𝚝𝚑𝚎𝚛•𝚜 𝙽𝚊𝚖𝚎    : 𝐀𝐝𝐨𝐦 (আ:)\n𝙲𝚛𝚎𝚊𝚝𝚘𝚛               : 𝐀𝐥𝐥𝐚𝐡\n𝙸𝚍𝚎𝚊𝚕                   : 𝐌𝐮𝐡𝐚𝐦𝐦𝐚𝐝 (সা.) \n𝙷𝚘𝚕𝚢 𝙱𝚘𝚘𝚔           : 𝐐𝐮𝐫𝐚𝐧 \n𝚁𝚎𝚕𝚒𝚐𝚒𝚘𝚗            : 𝐈𝐬𝐥𝐚𝐦 \n𝙸𝚍𝚎𝚗𝚝𝚒𝚝𝚢            : لَا إِلٰهَ إِلَّا الله مُحَمَّدٌ رَسُولُ الله• \n𝙷𝚘𝚋𝚋𝚒𝚎𝚜               : 𝐍𝐚𝐦𝐚𝐳 𝟓 𝐭𝐢𝐦𝐞𝐬 𝐚 𝐝𝐚𝐲 \n𝙿𝚛𝚎𝚜𝚎𝚗𝚝 𝙰𝚍𝚍𝚛𝚎𝚜𝚜           : 𝐃𝐮𝐧𝐢𝐲𝐚 \n𝙿𝚎𝚛𝚖𝚊𝚗𝚎𝚗𝚝 𝙰𝚍𝚍𝚛𝚎𝚜𝚜      : 𝐉𝐚𝐧𝐧𝐚𝐭 (𝐈𝐧 𝐬𝐡𝐚 𝐚𝐥𝐥𝐚𝐡)"
+    },
+    "07:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟕:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\nএখন সন্ধ্যা ৭ টা বাজে সবাই বই নিয়ে পড়তে বসো🥰\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "08:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟖:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\nএখন রাত ৮টা বাজে একটু পর এশার আযান দিবে সবাই নামাজ পড়ে নিও❤️😘\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "09:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟎𝟗:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\nএখন রাত ৯টা বাজে সবাই রাতের খাবার খেয়ে ঘুমাও🥱\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "10:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟏𝟎:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\nএখন রাত ১০টা বাজে সবাই ঘুমায় পড়ো আমার বউ নাই ভাই তাই ঘুম ও আসে না😭\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+    },
+    "11:00:00 PM": {
+      'message': "•—»🩷 𝐓𝐈𝐌𝐄 𝟏𝟏:𝟎𝟎 𝐏𝐌 🩷«—•\n  \n✢━━━━━━━━━━━━━━━✢\n\- আমি আত্নহত্যা ঠেকাতে পারলেও.! আত্নারহত্যা ঠেকাতে পারিনি__||🖤😊💔\n\n✢━━━━━━━━━━━━━━━✢\n\⃝—͟͟͞͞ 𝐂.𝐄.𝐎 𝐀𝐥𝐈𝐇𝐒𝐀𝐍 𝐒𝐇𝐎𝐔𝐑𝐎𝐕"
+  }
+ };
 
-  const runAutoTime = async () => {
-    try {
-      const res = await axios.get(
-        "https://shourov-api.onrender.com/api/autotime"
-      );
+  const run = async () => {
+    const now = moment().tz("Asia/Dhaka");
+    const timeKey = now.format("hh:mm:ss A");
+    const timeData = TIME_DATA[timeKey];
+    if (!timeData) return schedule();
 
-      if (!res.data || !res.data.message || !res.data.video)
-        return nextTick();
+    for (const thread of global.db.allThreadData) {
+      if (!thread.data?.autoTime) continue;
 
-      const { time, message, video } = res.data;
-
-      const threads = global.db.allThreadData.map(t => t.threadID);
-
-      for (const tid of threads) {
-
-        if (global.autotimeStatus[tid] === false) continue;
-
+      try {
         await api.sendMessage(
           {
-            body: `⏰ ${time}\n\n${message}\n\n— SHOUROV BOT 🤖`,
-            attachment: await global.utils.getStreamFromURL(video)
+            body: timeData.message,
+            attachment: await getRandomVideo()
           },
-          tid
+          thread.threadID
         );
+      } catch (e) {
+        console.log("AutoTime error:", e.message);
       }
-
-    } catch (e) {
-      console.log("AutoTime API error:", e.message);
     }
-
-    nextTick();
+    schedule();
   };
 
-  const nextTick = () => {
-    const now = new Date();
-    const delay =
-      60000 - (now.getSeconds() * 1000 + now.getMilliseconds());
-    setTimeout(runAutoTime, delay);
+  const schedule = () => {
+    const next = moment().add(1, "minute").startOf("minute");
+    setTimeout(run, next.diff(moment()));
   };
 
-  runAutoTime();
+  run();
 };
