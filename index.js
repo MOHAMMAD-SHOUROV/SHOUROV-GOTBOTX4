@@ -1,6 +1,5 @@
 const { spawn } = require("child_process");
-const log = require("./logger
-/log.js");
+const log = require("./logger/log.js");
 
 function startProject() {
 	const child = spawn("node", ["Shourov.js"], {
