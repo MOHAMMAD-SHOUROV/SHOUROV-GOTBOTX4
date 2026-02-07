@@ -12,7 +12,7 @@
   "antiInbox": false,
   "language": "en",
   "notesLanguage": "change to your language with ISO 639-1 code, available languages: vi (Vietnamese), en (English)",
-  "nickNameBot": "গ𝐒𝐇𝐎𝐔𝐑𝐎𝐕-𝐁𝐎𝐓",
+  "nickNameBot": "𝐒𝐇𝐎𝐔𝐑𝐎𝐕-𝐁𝐎𝐓",
   "prefix": "/",
   "adminOnly": {
     "enable": false,
@@ -32,8 +32,7 @@
   "whiteListMode": {
     "enable": false,
     "whiteListIds": [
-      "100083039411474",
-      "61584688437528"
+      "100081816009903"
     ],
     "notes": "if you enable this feature, only the ids in the whiteListIds list can use the bot"
   },
