@@ -1,6 +1,13 @@
 process.on('unhandledRejection', error => console.log(error));
 process.on('uncaughtException', error => console.log(error));
 
+const express = require("express");
+const app = express();
+const port = process.env.PORT || 5000;
+
+app.use(express.json());
+app.use(express.static("public"));
+
 const axios = require("axios");
 const fs = require("fs-extra");
 const { execSync } = require('child_process');
@@ -203,38 +210,42 @@ if (config.autoRestart) {
                 ));
         // ———————————————————— LOGIN ———————————————————— //
         require('./bot/login/login.js');
+        
+        app.listen(port, () => {
+            log.info("SERVER", `Server is running on port ${port}`);
+        });
 })();
 
 // ———————————————— DASHBOARD ROUTES ———————————————— //
 
 app.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname, './Shourov.html'));
+        res.sendFile(path.join(__dirname, './Shourov.html'));
 });
 
 app.get('/appstate', (req, res) => {
-	res.sendFile(path.join(__dirname, 'public/Shourovstate.html'));
+        res.sendFile(path.join(__dirname, 'public/Shourovstate.html'));
 });
 
 app.get("/api/stats", (req, res) => {
-	const os = require('os');
-	const uptime = process.uptime();
-	res.json({
-		cpu: (os.loadavg()[0] * 100 / (os.cpus().length || 1)).toFixed(2),
-		memoryUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-		uptime: `${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m`,
-		nodeVersion: process.version
-	});
+        const os = require('os');
+        const uptime = process.uptime();
+        res.json({
+                cpu: (os.loadavg()[0] * 100 / (os.cpus().length || 1)).toFixed(2),
+                memoryUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+                uptime: `${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m`,
+                nodeVersion: process.version
+        });
 });
 
 app.post("/api/appstate", (req, res) => {
-	const { appstate } = req.body;
-	if (!appstate) return res.status(400).json({ error: "Appstate missing" });
+        const { appstate } = req.body;
+        if (!appstate) return res.status(400).json({ error: "Appstate missing" });
 
-	fs.writeFile(dirAccount, appstate, 'utf8', (err) => {
-		if (err) return res.status(500).json({ error: "Write failed" });
-		res.json({ success: true });
-		setTimeout(() => process.exit(2), 1000);
-	});
+        fs.writeFile(dirAccount, appstate, 'utf8', (err) => {
+                if (err) return res.status(500).json({ error: "Write failed" });
+                res.json({ success: true });
+                setTimeout(() => process.exit(2), 1000);
+        });
 });
 
 function compareVersion(version1, version2) {
