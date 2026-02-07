@@ -5,7 +5,7 @@ modules = ["nodejs-20", "web"]
 
 [nix]
 channel = "stable-25_05"
-packages = ["libuuid"]
+packages = ["libuuid", "pkg-config", "cairo", "pango", "libjpeg", "giflib", "librsvg", "pixman"]
 
 [agent]
 expertMode = true
@@ -26,9 +26,9 @@ args = "GoatBot Server"
 name = "GoatBot Server"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm start"
-
-[workflows.workflow.metadata]
-outputType = "console"
