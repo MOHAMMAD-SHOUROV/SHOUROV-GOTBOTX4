@@ -5,7 +5,7 @@ module.exports.config = {
   name: "autotime",
   version: "2.1.0",
   role: 0,
-  author: "MR᭄﹅ MAHABUB﹅ メꪜ + Fix by ChatGPT",
+  author: "Alihsan Shourov",
   description: "Auto time with on/off & video",
   category: "AutoTime",
   countDown: 3
