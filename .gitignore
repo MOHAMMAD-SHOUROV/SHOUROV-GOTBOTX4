@@ -1,0 +1,19 @@
+node_modules/
+npm-debug.log*
+.env
+account.txt
+appstate.json
+config.json
+database/
+database /
+neokex_fca_database/
+*.sqlite
+*.sqlite3
+*.db
+.cache/
+.local/
+tmp/
+scripts/cmds/tmp/
+scripts/events/tmp/
+scripts/events/data/
+scripts/events/assets/
