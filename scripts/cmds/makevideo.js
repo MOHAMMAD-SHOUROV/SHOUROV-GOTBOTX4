@@ -3,9 +3,6 @@ const path = require("path");
 const axios = require("axios");
 const { exec } = require("child_process");
 
-// ffmpeg binary path (root/ffmpeg/ffmpeg)
-const FFMPEG_PATH = path.join(__dirname, "../../ffmpeg/ffmpeg");
-
 module.exports = {
   config: {
     name: "makevideo",
@@ -19,17 +16,17 @@ module.exports = {
 
   onStart: async ({ api, event, args }) => {
     try {
-      /* ================= duration ================= */
+      // ===== duration =====
       const duration = parseInt(args[0]) || 20;
       if (![10, 20, 30].includes(duration)) {
         return api.sendMessage(
-          "❌ Duration must be 10 / 20 / 30 seconds\nExample: mv 20",
+          "❌ Duration must be 10 / 20 / 30 seconds\nExample: /mv 20",
           event.threadID,
           event.messageID
         );
       }
 
-      /* ================= check reply image ================= */
+      // ===== check reply image =====
       if (
         !event.messageReply ||
         !event.messageReply.attachments ||
@@ -37,7 +34,7 @@ module.exports = {
         event.messageReply.attachments[0].type !== "photo"
       ) {
         return api.sendMessage(
-          "📸 Reply to an IMAGE to make video\nExample: reply + mv 20",
+          "📸 Reply to an image\nExample: reply image + /mv 20",
           event.threadID,
           event.messageID
         );
@@ -45,30 +42,30 @@ module.exports = {
 
       const imgUrl = event.messageReply.attachments[0].url;
 
-      /* ================= tmp folder ================= */
+      // ===== tmp folder =====
       const tmpDir = path.join(__dirname, "tmp");
-      if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+      if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
 
       const imgPath = path.join(tmpDir, `img_${event.senderID}.jpg`);
       const audioPath = path.join(tmpDir, `audio_${event.senderID}.mp3`);
       const outPath = path.join(tmpDir, `video_${event.senderID}.mp4`);
 
-      /* ================= trending song (MP3 only) ================= */
-      const songUrl = "https://files.catbox.moe/6k2x5r.mp3";
+      // ===== trending audio (auto fallback ready) =====
+      const songUrl = "https://files.catbox.moe/2dqwbl.mp3";
 
-      /* ================= download image ================= */
-      const imgRes = await axios.get(imgUrl, { responseType: "arraybuffer" });
-      fs.writeFileSync(imgPath, imgRes.data);
+      // ===== download image =====
+      const img = await axios.get(imgUrl, { responseType: "arraybuffer" });
+      fs.writeFileSync(imgPath, img.data);
 
-      /* ================= download audio ================= */
-      const audioRes = await axios.get(songUrl, { responseType: "arraybuffer" });
-      fs.writeFileSync(audioPath, audioRes.data);
+      // ===== download audio =====
+      const song = await axios.get(songUrl, { responseType: "arraybuffer" });
+      fs.writeFileSync(audioPath, song.data);
 
-      await api.sendMessage("🎬 Creating video... please wait", event.threadID);
+      api.sendMessage("🎬 Creating video... please wait ⏳", event.threadID);
 
-      /* ================= ffmpeg command ================= */
+      // ===== ffmpeg command (system ffmpeg) =====
       const cmd = `
-"${FFMPEG_PATH}" -y -loop 1 -i "${imgPath}" -i "${audioPath}" \
+ffmpeg -y -loop 1 -i "${imgPath}" -i "${audioPath}" \
 -filter_complex "
 scale=720:1280,
 zoompan=z='min(zoom+0.0015,1.2)':d=125,
@@ -86,13 +83,13 @@ fade=t=out:st=${duration - 1}:d=1
 
         await api.sendMessage(
           {
-            body: "✨ Your video is ready!",
+            body: "✨ Video ready!",
             attachment: fs.createReadStream(outPath)
           },
           event.threadID
         );
 
-        /* ================= cleanup ================= */
+        // ===== cleanup =====
         [imgPath, audioPath, outPath].forEach(f => {
           if (fs.existsSync(f)) fs.unlinkSync(f);
         });
