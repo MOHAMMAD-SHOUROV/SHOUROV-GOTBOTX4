@@ -3,21 +3,14 @@ const moment = require("moment-timezone");
 module.exports = {
 	config: {
 		name: "daily",
-		version: "1.2",
-		author: "NTKhang",
+		version: "1.3",
+		author: "alihsan Shourov",
 		countDown: 5,
 		role: 0,
 		description: {
-			vi: "Nhận quà hàng ngày",
-			en: "Receive daily gift"
+			en: "Receive daily reward"
 		},
 		category: "game",
-		guide: {
-			vi: "   {pn}: Nhận quà hàng ngày"
-				+ "\n   {pn} info: Xem thông tin quà hàng ngày",
-			en: "   {pn}"
-				+ "\n   {pn} info: View daily gift information"
-		},
 		envConfig: {
 			rewardFirstDay: {
 				coin: 100,
@@ -27,17 +20,6 @@ module.exports = {
 	},
 
 	langs: {
-		vi: {
-			monday: "Thứ 2",
-			tuesday: "Thứ 3",
-			wednesday: "Thứ 4",
-			thursday: "Thứ 5",
-			friday: "Thứ 6",
-			saturday: "Thứ 7",
-			sunday: "Chủ nhật",
-			alreadyReceived: "Bạn đã nhận quà rồi",
-			received: "Bạn đã nhận được %1 coin và %2 exp"
-		},
 		en: {
 			monday: "Monday",
 			tuesday: "Tuesday",
@@ -46,47 +28,60 @@ module.exports = {
 			friday: "Friday",
 			saturday: "Saturday",
 			sunday: "Sunday",
-			alreadyReceived: "You have already received the gift",
-			received: "You have received %1 coin and %2 exp"
+			alreadyReceived: "❌ You already received today's reward",
+			received: "🎁 You received %1 coin and %2 exp"
 		}
 	},
 
 	onStart: async function ({ args, message, event, envCommands, usersData, commandName, getLang }) {
 		const reward = envCommands[commandName].rewardFirstDay;
-		if (args[0] == "info") {
-			let msg = "";
-			for (let i = 1; i < 8; i++) {
-				const getCoin = Math.floor(reward.coin * (1 + 20 / 100) ** ((i == 0 ? 7 : i) - 1));
-				const getExp = Math.floor(reward.exp * (1 + 20 / 100) ** ((i == 0 ? 7 : i) - 1));
-				const day = i == 7 ? getLang("sunday") :
-					i == 6 ? getLang("saturday") :
-						i == 5 ? getLang("friday") :
-							i == 4 ? getLang("thursday") :
-								i == 3 ? getLang("wednesday") :
-									i == 2 ? getLang("tuesday") :
-										getLang("monday");
-				msg += `${day}: ${getCoin} coin, ${getExp} exp\n`;
+		const { senderID } = event;
+
+		// INFO
+		if (args[0] === "info") {
+			let msg = "📅 Daily rewards:\n\n";
+			const days = [
+				getLang("sunday"),
+				getLang("monday"),
+				getLang("tuesday"),
+				getLang("wednesday"),
+				getLang("thursday"),
+				getLang("friday"),
+				getLang("saturday")
+			];
+
+			for (let i = 1; i <= 7; i++) {
+				const coin = Math.floor(reward.coin * Math.pow(1.2, i - 1));
+				const exp = Math.floor(reward.exp * Math.pow(1.2, i - 1));
+				msg += `${days[i % 7]}: ${coin} coin, ${exp} exp\n`;
 			}
 			return message.reply(msg);
 		}
 
-		const dateTime = moment.tz("Asia/Ho_Chi_Minh").format("DD/MM/YYYY");
-		const date = new Date();
-		const currentDay = date.getDay(); // 0: sunday, 1: monday, 2: tuesday, 3: wednesday, 4: thursday, 5: friday, 6: saturday
-		const { senderID } = event;
+		// TIME
+		const today = moment.tz("Asia/Dhaka").format("DD/MM/YYYY");
+		const currentDay = new Date().getDay(); // 0 sunday
 
+		// USER DATA
 		const userData = await usersData.get(senderID);
-		if (userData.data.lastTimeGetReward === dateTime)
+		if (!userData.data) userData.data = {};
+
+		if (userData.data.lastTimeGetReward === today)
 			return message.reply(getLang("alreadyReceived"));
 
-		const getCoin = Math.floor(reward.coin * (1 + 20 / 100) ** ((currentDay == 0 ? 7 : currentDay) - 1));
-		const getExp = Math.floor(reward.exp * (1 + 20 / 100) ** ((currentDay == 0 ? 7 : currentDay) - 1));
-		userData.data.lastTimeGetReward = dateTime;
+		// CALC REWARD
+		const dayIndex = currentDay === 0 ? 7 : currentDay;
+		const coin = Math.floor(reward.coin * Math.pow(1.2, dayIndex - 1));
+		const exp = Math.floor(reward.exp * Math.pow(1.2, dayIndex - 1));
+
+		userData.data.lastTimeGetReward = today;
+
 		await usersData.set(senderID, {
-			money: userData.money + getCoin,
-			exp: userData.exp + getExp,
+			money: (userData.money || 0) + coin,
+			exp: (userData.exp || 0) + exp,
 			data: userData.data
 		});
-		message.reply(getLang("received", getCoin, getExp));
+
+		message.reply(getLang("received", coin, exp));
 	}
 };
