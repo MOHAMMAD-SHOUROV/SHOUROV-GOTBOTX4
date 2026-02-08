@@ -274,12 +274,12 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                 let userData = global.db.allUserData.find(u => u.userID == senderID) || { userID: senderID, data: {}, banned: {}, money: 0 };
 
                 if (!userData && !isNaN(senderID))
-                        userData = await usersData.create(senderID);
+                        userData = await usersData.create(senderID) || { userID: senderID, data: {}, banned: {}, money: 0 };
 
                 if (!threadData && !isNaN(threadID)) {
                         if (global.temp.createThreadDataError.includes(threadID))
                                 return;
-                        threadData = await threadsData.create(threadID);
+                        threadData = await threadsData.create(threadID) || { threadID, data: {}, settings: {}, banned: {}, adminIDs: [] };
                         global.db.receivedTheFirstMessage[threadID] = true;
                 }
                 else {

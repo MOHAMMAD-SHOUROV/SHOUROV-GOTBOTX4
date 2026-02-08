@@ -231,7 +231,7 @@ function getPrefix(threadID) {
                 throw new Error('The first argument (threadID) must be a number');
         threadID = String(threadID);
         let prefix = global.GoatBot.config.prefix;
-        const threadData = global.db.allThreadData.find(t => t.threadID == threadID);
+        const threadData = (global.db.allThreadData || []).find(t => t.threadID == threadID);
         if (threadData)
                 prefix = threadData.data.prefix || prefix;
         return prefix;

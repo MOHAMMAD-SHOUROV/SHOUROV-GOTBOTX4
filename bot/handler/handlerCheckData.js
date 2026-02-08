@@ -13,7 +13,7 @@ module.exports = async function (usersData, threadsData, event) {
                         if (global.temp.createThreadDataError.includes(threadID))
                                 return;
 
-                        const findInCreatingThreadData = creatingThreadData.find(t => t.threadID == threadID);
+                        const findInCreatingThreadData = (creatingThreadData || []).find(t => t.threadID == threadID);
                         if (!findInCreatingThreadData) {
                                 if (global.db.allThreadData.some(t => t.threadID == threadID))
                                         return;
@@ -39,7 +39,7 @@ module.exports = async function (usersData, threadsData, event) {
         // ————————————— CHECK USER DATA ————————————— //
         if (senderID) {
                 try {
-                        const findInCreatingUserData = creatingUserData.find(u => u.userID == senderID);
+                        const findInCreatingUserData = (creatingUserData || []).find(u => u.userID == senderID);
                         if (!findInCreatingUserData) {
                                 if (db.allUserData.some(u => u.userID == senderID))
                                         return;

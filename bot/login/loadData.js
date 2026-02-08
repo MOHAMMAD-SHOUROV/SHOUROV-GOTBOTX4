@@ -22,6 +22,14 @@ module.exports = async function (api, createLine) {
         }
         const controller = await require(controllerPath)(api); // data is loaded here
         const { threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData, sequelize } = controller;
+        
+        if (!usersData.getName) {
+                usersData.getName = async (userID) => {
+                        const user = (global.db.allUserData || []).find(u => u.userID == userID);
+                        return user ? user.name : "Facebook User";
+                };
+        }
+
         log.info('DATABASE', getText('loadData', 'loadThreadDataSuccess', global.db.allThreadData.filter(t => t.threadID.toString().length > 15).length));
         log.info('DATABASE', getText('loadData', 'loadUserDataSuccess', global.db.allUserData.length));
         if (api && global.GoatBot.config.database.autoSyncWhenStart == true) {
@@ -50,7 +58,7 @@ module.exports = async function (api, createLine) {
                         const allThreadDataDontHaveBot = allThreadData.filter(thread => !allThreadInfo.some(thread1 => thread.threadID === thread1.threadID));
                         const botID = api.getCurrentUserID();
                         for (const thread of allThreadDataDontHaveBot) {
-                                const findMe = thread.members.find(m => m.userID == botID);
+                                const findMe = (thread.members || []).find(m => m.userID == botID);
                                 if (findMe) {
                                         findMe.inGroup = false;
                                         await threadsData.set(thread.threadID, { members: thread.members });
