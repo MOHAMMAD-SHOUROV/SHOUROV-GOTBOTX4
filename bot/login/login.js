@@ -882,7 +882,12 @@ async function startBot(loginWithEmail) {
                                 .map(item => item = item.toString());
                         for (const uid of adminBot) {
                                 try {
-                                        const userName = ((await usersData.get?(uid))?.name || "Unknown User");
+                                        let userName = "Unknown User";
+
+if (usersData && typeof usersData.get === "function") {
+  const user = await usersData.get(uid);
+  if (user && user.name) userName = user.name;
+}
                                         log.master("SHOUROV-BOT ADMINBOT", `[${++i}] ${uid} | ${userName}`);
                                 }
                                 catch (e) {
