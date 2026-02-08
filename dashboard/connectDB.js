@@ -1,7 +1,7 @@
 const path = require("path");
 
-const dirConfig = path.join(`${__dirname}/../${process.env.NODE_ENV === 'development' ? 'Shourov.json'}`);
-const dirConfigCommands = path.join(`${__dirname}/../${process.env.NODE_ENV === 'development' ? 'configCommands.json'}`);
+const dirConfig = path.join(`${__dirname}/../Shourov.json`);
+const dirConfigCommands = path.join(`${__dirname}/../configCommands.json`);
 
 global.GoatBot = {
 	config: require(dirConfig),
