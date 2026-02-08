@@ -1,6 +1,6 @@
 module.exports = {
   config: {
-    name: "axt3",
+    name: "sm3",
     role: 0,
     description: "Neon hacker style gif"
   },
@@ -8,7 +8,7 @@ module.exports = {
   onStart: async ({ api, event, args }) => {
     const name = args.join(" ");
     if (!name) {
-      return api.sendMessage("❌ Usage: axt3 Shourov", event.threadID);
+      return api.sendMessage("❌ Usage: sm3 Shourov", event.threadID);
     }
 
     const msg =
