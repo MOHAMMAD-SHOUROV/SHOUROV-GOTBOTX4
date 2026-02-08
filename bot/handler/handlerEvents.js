@@ -164,8 +164,10 @@ function getRoleConfig(utils, command, isGroup, threadData, commandName) {
                 };
         }
 
-        if (isGroup)
-                roleConfig.onStart = threadData.data.setRole?.[commandName] ?? roleConfig.onStart;
+        if (isGroup) {
+                const threadDataData = threadData?.data || {};
+                roleConfig.onStart = threadDataData.setRole?.[commandName] ?? roleConfig.onStart;
+        }
 
         for (const key of ["onChat", "onStart", "onReaction", "onReply"]) {
                 if (roleConfig[key] == undefined)
@@ -268,8 +270,8 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
 
                 const senderID = event.userID || event.senderID || event.author;
 
-                let threadData = global.db.allThreadData.find(t => t.threadID == threadID);
-                let userData = global.db.allUserData.find(u => u.userID == senderID);
+                let threadData = global.db.allThreadData.find(t => t.threadID == threadID) || { threadID, data: {}, settings: {}, banned: {}, adminIDs: [] };
+                let userData = global.db.allUserData.find(u => u.userID == senderID) || { userID: senderID, data: {}, banned: {}, money: 0 };
 
                 if (!userData && !isNaN(senderID))
                         userData = await usersData.create(senderID);
@@ -316,7 +318,8 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                                 return body_.replace(new RegExp(`^${prefix_}(\\s+|)${commandName_}`, "i"), "").trim();
                         }
                 };
-                const langCode = threadData.data.lang || config.language || "en";
+                const threadDataData = threadData?.data || {};
+                const langCode = threadDataData.lang || config.language || "en";
 
                 function createMessageSyntaxError(commandName) {
                         message.SyntaxError = async function () {
@@ -353,8 +356,8 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                         if (!body || !body.startsWith(prefix))
                                 return;
 
-                        // —————————— CHECK SPAM BANNED THREAD —————————— //
-                        if (isGroup) {
+                        // — — — — — — — — — — CHECK SPAM BANNED THREAD — — — — — — — — — — //
+                        if (isGroup && threadID) {
                                 const isSpamBanned = await checkSpamBannedThread(threadID, globalData);
                                 if (isSpamBanned) {
                                         if (!hideNotiMessage.threadBanned)
@@ -368,7 +371,8 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                         let commandName = args.shift().toLowerCase();
                         let command = GoatBot.commands.get(commandName) || GoatBot.commands.get(GoatBot.aliases.get(commandName));
                         // ———————— CHECK ALIASES SET BY GROUP ———————— //
-                        const aliasesData = threadData.data.aliases || {};
+                        const threadDataData = threadData?.data || {};
+                        const aliasesData = threadDataData.aliases || {};
                         for (const cmdName in aliasesData) {
                                 if (aliasesData[cmdName].includes(commandName)) {
                                         command = GoatBot.commands.get(cmdName);
