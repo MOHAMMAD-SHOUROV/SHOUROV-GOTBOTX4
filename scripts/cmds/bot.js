@@ -1,172 +1,140 @@
 const axios = require("axios");
 
+let API_CACHE = null;
+async function getApiConfig() {
+	if (API_CACHE) return API_CACHE;
+	const { data } = await axios.get(
+		"https://raw.githubusercontent.com/MOHAMMAD-NAYAN-07/Nayan/main/api.json"
+	);
+	API_CACHE = data;
+	return data;
+}
+
 module.exports = {
-  config: {
-    name: "bot",
-    version: "2.3.1",
-    role: 0,
-    credits: "Alihsan Shourov",
-    description: "Chat with a Simsimi-like bot (reply + trigger words support)",
-    prefix: false,
-    category: "fun",
-    guide: {
-      en: "{pn} [message]\n{pn} teach ask=[q]&ans=[a]\n{pn} delete ask=[q]&ans=[a]\n{pn} edit old=[q]&new=[new]\n{pn} askinfo [q]\n{pn} info"
-    }
-  },
+	config: {
+		name: "bot",
+		version: "2.4.0",
+		role: 0,
+		credits: "Alihsan Shourov (fixed)",
+		description: "Smart chat bot (Simsimi style)",
+		prefix: false,
+		category: "fun"
+	},
 
-  
-  onStart: async function ({ api, event, args, usersData }) {
-    const { threadID, messageID, senderID } = event;
-    const query = args.join(" ");
+	onStart: async function ({ api, event, args, usersData }) {
+		const { threadID, messageID, senderID } = event;
+		const query = args.join(" ").trim();
 
-    try {
-      const { data } = await axios.get("https://raw.githubusercontent.com/MOHAMMAD-NAYAN-07/Nayan/main/api.json");
-      const apiUrl = data.sim;
-      const apiUrl2 = data.api2;
-      const userName = (((await usersData.get?(senderID))?.name || "Unknown User")) || "User";
+		try {
+			const apiConf = await getApiConfig();
+			const apiUrl = apiConf.sim;
+			const apiUrl2 = apiConf.api2;
 
-      
-      if (!query) {
-        const greetings = [
-          "আহ শুনা আমার তোমার অলিতে গলিতে উম্মাহ😇😘",
-          "কি গো সোনা আমাকে ডাকছ কেনো",
-          "বার বার আমাকে ডাকস কেন😡",
-          "আহ শোনা আমার আমাকে এতো ডাক্তাছো কেনো আসো বুকে আশো🥱",
-          "হুম জান তোমার অইখানে উম্মমাহ😷😘",
-          "আসসালামু আলাইকুম বলেন আপনার জন্য কি করতে পারি",
-          "আমাকে এতো না ডেকে বস সৌরভ'কে একটা গফ দে 🙄",
-          "jang hanga korba",
-          "jang bal falaba🙂"
-        ];
-        const rand = greetings[Math.floor(Math.random() * greetings.length)];
-        return api.sendMessage({
-          body: `「 ${userName} 」\n\n${rand}`,
-          mentions: [{ tag: userName, id: senderID }]
-        }, threadID, (err, info) => {
-          if (!err) {
-            global.GoatBot.onReply.set(info.messageID, {
-              type: "reply",
-              commandName: this.config.name,
-              author: senderID
-            });
-          }
-        }, messageID);
-      }
+			const userData = await usersData.get(senderID);
+			const userName = userData?.name || "User";
 
-      
-      if (query.startsWith("teach")) {
-        const params = query.replace("teach", "").trim().split("&");
-        const question = params[0]?.replace("ask=", "").trim();
-        const answer = params[1]?.replace("ans=", "").trim();
-        if (!question || !answer) return api.sendMessage("⚠️ Format: teach ask=[q]&ans=[a]", threadID, messageID);
+			// ===== NO TEXT =====
+			if (!query) {
+				const replies = [
+					"হুম বলো জান 😌",
+					"আমাকে ডাকছো কেনো 🫣",
+					"এই যে আমি শুনছি 👀",
+					"বারবার ডাকলে প্রেমে পড়ে যাবো কিন্তু 😏"
+				];
+				return api.sendMessage(
+					`「 ${userName} 」\n\n${replies[Math.floor(Math.random() * replies.length)]}`,
+					threadID,
+					messageID
+				);
+			}
 
-        const res = await axios.get(`${apiUrl}/sim?type=teach&ask=${encodeURIComponent(question)}&ans=${encodeURIComponent(answer)}`);
-        const { msg, data } = res.data;
-        return api.sendMessage(
-          msg.includes("already")
-            ? `📝 Already in DB\n1️⃣ ASK: ${data.ask}\n2️⃣ ANS: ${data.ans}`
-            : `📝 Added Successfully\n1️⃣ ASK: ${data.ask}\n2️⃣ ANS: ${data.ans}`,
-          threadID, messageID
-        );
-      }
+			// ===== TEACH =====
+			if (query.startsWith("teach")) {
+				const p = query.replace("teach", "").trim().split("&");
+				const q = p[0]?.replace("ask=", "").trim();
+				const a = p[1]?.replace("ans=", "").trim();
+				if (!q || !a)
+					return api.sendMessage(
+						"⚠️ teach ask=[q]&ans=[a]",
+						threadID,
+						messageID
+					);
 
-      
-      if (query.startsWith("delete")) {
-        const params = query.replace("delete", "").trim().split("&");
-        const question = params[0]?.replace("ask=", "").trim();
-        const answer = params[1]?.replace("ans=", "").trim();
-        if (!question || !answer) return api.sendMessage("⚠️ Format: delete ask=[q]&ans=[a]", threadID, messageID);
+				const res = await axios.get(
+					`${apiUrl}/sim?type=teach&ask=${encodeURIComponent(q)}&ans=${encodeURIComponent(a)}`
+				);
+				return api.sendMessage(res.data.msg || "✅ Done", threadID, messageID);
+			}
 
-        const res = await axios.get(`${apiUrl}/sim?type=delete&ask=${encodeURIComponent(question)}&ans=${encodeURIComponent(answer)}&uid=${senderID}`);
-        return api.sendMessage(res.data.msg || "✅ Deleted successfully!", threadID, messageID);
-      }
+			// ===== INFO =====
+			if (query === "info") {
+				const res = await axios.get(`${apiUrl}/sim?type=info`);
+				return api.sendMessage(
+					`📊 Total Ask: ${res.data.data.totalKeys}\n📊 Total Ans: ${res.data.data.totalResponses}`,
+					threadID,
+					messageID
+				);
+			}
 
-      
-      if (query.startsWith("edit")) {
-        const params = query.replace("edit", "").trim().split("&");
-        const oldQ = params[0]?.replace("old=", "").trim();
-        const newQ = params[1]?.replace("new=", "").trim();
-        if (!oldQ || !newQ) return api.sendMessage("⚠️ Format: edit old=[q]&new=[new]", threadID, messageID);
+			// ===== NORMAL CHAT =====
+			const res = await axios.get(
+				`${apiUrl}/sim?type=ask&ask=${encodeURIComponent(query)}`
+			);
+			let reply = res.data?.data?.msg || "🙂";
 
-        const res = await axios.get(`${apiUrl}/sim?type=edit&old=${encodeURIComponent(oldQ)}&new=${encodeURIComponent(newQ)}&uid=${senderID}`);
-        return api.sendMessage(res.data.msg || "✏️ Edited successfully!", threadID, messageID);
-      }
+			// font fallback safe
+			try {
+				const font = await axios.get(
+					`${apiUrl2}/bold?text=${encodeURIComponent(reply)}&type=serif`
+				);
+				reply = font.data?.data?.bolded || reply;
+			} catch {}
 
-      
-      if (query.startsWith("info")) {
-        const res = await axios.get(`${apiUrl}/sim?type=info`);
-        return api.sendMessage(`📊 Total Ask: ${res.data.data.totalKeys}\n📊 Total Ans: ${res.data.data.totalResponses}`, threadID, messageID);
-      }
+			api.sendMessage(reply, threadID, (err, info) => {
+				if (!err) {
+					global.GoatBot.onReply.set(info.messageID, {
+						commandName: "bot",
+						author: senderID
+					});
+				}
+			}, messageID);
 
-      
-      if (query.startsWith("askinfo")) {
-        const question = query.replace("askinfo", "").trim();
-        if (!question) return api.sendMessage("⚠️ Please provide a question.", threadID, messageID);
+		} catch (e) {
+			console.error("BOT ERROR:", e);
+			api.sendMessage("⚠️ Bot is tired, try later 😴", threadID, messageID);
+		}
+	},
 
-        const res = await axios.get(`${apiUrl}/sim?type=keyinfo&ask=${encodeURIComponent(question)}`);
-        const answers = res.data.data.answers || [];
-        if (!answers.length) return api.sendMessage(`❌ No info for "${question}"`, threadID, messageID);
+	onReply: async function ({ api, event, Reply }) {
+		const { senderID, threadID, messageID, body } = event;
+		if (Reply.author !== senderID) return;
+		if (!body || typeof body !== "string") return;
 
-        const replyMsg = `ℹ️ Info for "${question}":\n` +
-          answers.map((ans, i) => `📌 ${i + 1}. ${ans}`).join("\n") +
-          `\n\nTotal answers: ${answers.length}`;
-        return api.sendMessage(replyMsg, threadID, messageID);
-      }
+		try {
+			const apiConf = await getApiConfig();
+			const res = await axios.get(
+				`${apiConf.sim}/sim?type=ask&ask=${encodeURIComponent(body)}`
+			);
+			let reply = res.data?.data?.msg || "🙂";
 
-      
-      const res = await axios.get(`${apiUrl}/sim?type=ask&ask=${encodeURIComponent(query)}`);
-      const reply = res.data.data.msg;
+			try {
+				const font = await axios.get(
+					`${apiConf.api2}/bold?text=${encodeURIComponent(reply)}&type=serif`
+				);
+				reply = font.data?.data?.bolded || reply;
+			} catch {}
 
-      const font = await axios.get(`${apiUrl2}/bold?text=${reply}&type=serif`);
-      const styledText = font.data.data.bolded;
+			api.sendMessage(reply, threadID, (err, info) => {
+				if (!err) {
+					global.GoatBot.onReply.set(info.messageID, {
+						commandName: "bot",
+						author: senderID
+					});
+				}
+			}, messageID);
 
-      api.sendMessage(styledText, threadID, (err, info) => {
-        if (!err) {
-          global.GoatBot.onReply.set(info.messageID, {
-            type: "reply",
-            commandName: this.config.name,
-            author: senderID
-          });
-        }
-      }, messageID);
-
-    } catch (e) {
-      console.error("Bot error:", e);
-      api.sendMessage("⚠️ An error occurred, try later.", threadID, messageID);
-    }
-  },
-
-  
-  onReply: async ({ api, event, Reply }) => {
-    let { threadID, messageID, senderID, body } = event;
-    if (typeof body !== "string") body = "";
-    if (Reply.author !== senderID) return;
-
-    try {
-      const { data } = await axios.get("https://raw.githubusercontent.com/MOHAMMAD-NAYAN-07/Nayan/main/api.json");
-      const apiUrl = data.sim;
-      const apiUrl2 = data.api2;
-
-      const res = await axios.get(`${apiUrl}/sim?type=ask&ask=${encodeURIComponent(body)}`);
-      const reply = res.data.data.msg;
-
-      const font = await axios.get(`${apiUrl2}/bold?text=${reply}&type=serif`);
-      const styledText = font.data.data.bolded;
-
-      api.sendMessage(styledText, threadID, (err, info) => {
-        if (!err) {
-          global.GoatBot.onReply.set(info.messageID, {
-            type: "reply",
-            commandName: "bot",
-            author: senderID
-          });
-        }
-      }, messageID);
-
-    } catch (e) {
-      console.error("Reply error:", e);
-      api.sendMessage("⚠️ Error while replying.", threadID, messageID);
-    }
-  }
-
+		} catch (e) {
+			console.error("REPLY ERROR:", e);
+		}
+	}
 };
