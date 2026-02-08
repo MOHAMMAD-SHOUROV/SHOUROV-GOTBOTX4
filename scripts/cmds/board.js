@@ -11,7 +11,7 @@ registerFont(
 module.exports = {
   config: {
     name: "board",
-    aliases: ["back"],
+    aliases: ["brd"],
     version: "1.1",
     author: "Alihsan Shourov",
     role: 0,
