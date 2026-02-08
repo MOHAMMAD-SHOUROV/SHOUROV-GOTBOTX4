@@ -1,64 +1,74 @@
 module.exports = {
- config: {
- name: "antiout",
- version: "1.0",
- author: "Chitron Bhattacharjee",
- countDown: 5,
- role: 1, // Only admin can use this command
- shortDescription: {
- en: "Prevent members from leaving the group"
- },
- longDescription: {
- en: "Enable/disable anti-out feature that automatically adds back members who leave the group"
- },
- category: "admin",
- guide: {
- en: "{pn} [on|off] - Turn anti-out feature on or off"
- }
- },
+  config: {
+    name: "antiout",
+    version: "1.1",
+    author: "Chitron Bhattacharjee (Fixed)",
+    countDown: 5,
+    role: 1,
+    shortDescription: {
+      en: "Prevent members from leaving the group"
+    },
+    longDescription: {
+      en: "Automatically adds members back if they leave the group"
+    },
+    category: "admin",
+    guide: {
+      en: "{pn} on | off"
+    }
+  },
 
- langs: {
- en: {
- turnedOn: "🛡️ Anti-out feature has been enabled for this group",
- turnedOff: "🛡️ Anti-out feature has been disabled for this group",
- missingPermission: "❌ Sorry boss! I couldn't add the user back.\nUser %1 might have blocked me or doesn't have messenger option enabled.",
- addedBack: "⚠️ Attention %1!\nThis group belongs to my boss!\nYou need admin clearance to leave this group!"
- }
- },
+  langs: {
+    en: {
+      turnedOn: "🛡️ Anti-out has been ENABLED for this group",
+      turnedOff: "🛡️ Anti-out has been DISABLED for this group",
+      addedBack:
+        "⚠️ Attention %1!\nThis group is protected.\nYou are not allowed to leave!",
+      missingPermission:
+        "❌ Failed to add %1 back.\nThey may have blocked the bot or Messenger is restricted."
+    }
+  },
 
- onStart: async function ({ args, message, event, threadsData, getLang }) {
- if (args[0] === "on") {
- await threadsData.set(event.threadID, true, "data.antiout");
- message.reply(getLang("turnedOn"));
- } 
- else if (args[0] === "off") {
- await threadsData.set(event.threadID, false, "data.antiout");
- message.reply(getLang("turnedOff"));
- }
- else {
- message.reply("Please specify 'on' or 'off' to enable/disable anti-out feature");
- }
- },
+  onStart: async function ({ args, message, event, threadsData, getLang }) {
+    const option = args[0];
 
- onEvent: async function ({ event, api, threadsData, usersData, getLang }) {
- if (event.logMessageType !== "log:unsubscribe") 
- return;
+    if (option === "on") {
+      await threadsData.set(event.threadID, true, "data.antiout");
+      return message.reply(getLang("turnedOn"));
+    }
 
- const antiout = await threadsData.get(event.threadID, "data.antiout");
- if (!antiout) 
- return;
+    if (option === "off") {
+      await threadsData.set(event.threadID, false, "data.antiout");
+      return message.reply(getLang("turnedOff"));
+    }
 
- if (event.logMessageData.leftParticipantFbId === api.getCurrentUserID()) 
- return;
+    return message.reply("❗ Use: antiout on | antiout off");
+  },
 
- const name = ((await usersData.get?(event.logMessageData.leftParticipantFbId))?.name || "Unknown User");
- 
- try {
- await api.addUserToGroup(event.logMessageData.leftParticipantFbId, event.threadID);
- api.sendMessage(getLang("addedBack", name), event.threadID);
- } 
- catch (error) {
- api.sendMessage(getLang("missingPermission", name), event.threadID);
- }
- }
+  onEvent: async function ({ event, api, threadsData, usersData, getLang }) {
+    if (event.logMessageType !== "log:unsubscribe") return;
+
+    const antiout = await threadsData.get(event.threadID, "data.antiout");
+    if (!antiout) return;
+
+    const leftID = event.logMessageData.leftParticipantFbId;
+
+    // Ignore bot itself
+    if (leftID === api.getCurrentUserID()) return;
+
+    const name =
+      ((await usersData.get?.(leftID))?.name) || "Unknown User";
+
+    try {
+      await api.addUserToGroup(leftID, event.threadID);
+      await api.sendMessage(
+        getLang("addedBack", name),
+        event.threadID
+      );
+    } catch (err) {
+      await api.sendMessage(
+        getLang("missingPermission", name),
+        event.threadID
+      );
+    }
+  }
 };
