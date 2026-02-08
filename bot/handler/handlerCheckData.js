@@ -41,7 +41,7 @@ module.exports = async function (usersData, threadsData, event) {
                 try {
                         const findInCreatingUserData = (creatingUserData || []).find(u => u.userID == senderID);
                         if (!findInCreatingUserData) {
-                                if (db.allUserData.some(u => u.userID == senderID))
+                                if (db.allUserData && db.allUserData.some(u => u.userID == senderID))
                                         return;
 
                                 const userData = await usersData.create(senderID);
