@@ -151,7 +151,7 @@ module.exports = {
 		if (!findMember) {
 			members.push({
 				userID: senderID,
-				name: await usersData.getName(senderID),
+				name: ((await usersData.get?(senderID))?.name || "Unknown User"),
 				nickname: null,
 				inGroup: true,
 				count: 1

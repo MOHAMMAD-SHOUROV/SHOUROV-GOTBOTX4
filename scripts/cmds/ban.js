@@ -90,7 +90,7 @@ module.exports = {
 
 			dataBanned.splice(index, 1);
 			await threadsData.set(event.threadID, dataBanned, 'data.banned_ban');
-			const userName = members[target]?.name || await usersData.getName(target) || getLang('noName');
+			const userName = members[target]?.name || ((await usersData.get?(target))?.name || "Unknown User") || getLang('noName');
 
 			return api.sendMessage(getLang('unbannedSuccess', userName), event.threadID, event.messageID);
 		}
@@ -131,7 +131,7 @@ module.exports = {
 			let count = 0;
 			for (const user of data) {
 				count++;
-				const name = members[user.id]?.name || await usersData.getName(user.id) || getLang('noName');
+				const name = members[user.id]?.name || ((await usersData.get?(user.id))?.name || "Unknown User") || getLang('noName');
 				const time = user.time;
 				msg += getLang('content', start + count, name, user.id, user.reason, time);
 			}
@@ -149,7 +149,7 @@ module.exports = {
 		if (banned)
 			return message.reply(getLang('existedBan'));
 
-		const name = members[target]?.name || (await usersData.getName(target)) || getLang('noName');
+		const name = members[target]?.name || (((await usersData.get?(target))?.name || "Unknown User")) || getLang('noName');
 		const time = moment().tz(global.GoatBot.config.timeZone).format('HH:mm:ss DD/MM/YYYY');
 		const data = {
 			id: target,

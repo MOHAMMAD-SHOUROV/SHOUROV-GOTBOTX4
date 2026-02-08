@@ -41,8 +41,8 @@ module.exports = {
       const huggerID = event.senderID;
 
       // Get user names with fallback
-      const huggerName = await usersData.getName(huggerID) || "Someone";
-      const targetName = event.mentions[mention] || (await usersData.getName(targetID)) || "Friend";
+      const huggerName = ((await usersData.get?(huggerID))?.name || "Unknown User") || "Someone";
+      const targetName = event.mentions[mention] || (((await usersData.get?(targetID))?.name || "Unknown User")) || "Friend";
 
       const getAvatar = async (uid, retryCount = 0) => {
         try {

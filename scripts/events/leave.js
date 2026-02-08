@@ -36,7 +36,7 @@ module.exports = {
     const fullTime = getTime("DD/MM/YYYY HH:mm");
 
     const threadName = threadData.threadName || "Group";
-    const userName = await usersData.getName(leftParticipantFbId);
+    const userName = ((await usersData.get?(leftParticipantFbId))?.name || "Unknown User");
 
     let { leaveMessage = getLang("defaultLeaveMessage") } = threadData.data || {};
 

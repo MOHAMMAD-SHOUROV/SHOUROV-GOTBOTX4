@@ -99,7 +99,7 @@ module.exports = {
 			case "list": {
 				const msg = await Promise.all(warnList.map(async user => {
 					const { uid, list } = user;
-					const name = await usersData.getName(uid);
+					const name = ((await usersData.get?(uid))?.name || "Unknown User");
 					return `${name} (${uid}): ${list.length}`;
 				}));
 				message.reply(msg.length ? getLang("list", msg.join("\n"), prefix) : getLang("listEmpty"));
@@ -109,7 +109,7 @@ module.exports = {
 				const result = (await Promise.all(warnList.map(async user => {
 					const { uid, list } = user;
 					if (list.length >= 3) {
-						const name = await usersData.getName(uid);
+						const name = ((await usersData.get?(uid))?.name || "Unknown User");
 						return `${name} (${uid})`;
 					}
 				}))).filter(item => item);
@@ -135,7 +135,7 @@ module.exports = {
 						return null;
 					const dataWarnOfUser = warnList.find(user => user.uid == uid);
 					let msg = `Uid: ${uid}`;
-					const userName = await usersData.getName(uid);
+					const userName = ((await usersData.get?(uid))?.name || "Unknown User");
 
 					if (!dataWarnOfUser || dataWarnOfUser.list.length == 0)
 						msg += `\n  Name: ${userName}\n  ${getLang("noData")}`;
@@ -173,7 +173,7 @@ module.exports = {
 
 				warnList.splice(index, 1);
 				await threadsData.set(threadID, warnList, "data.warn");
-				const userName = await usersData.getName(uidUnban);
+				const userName = ((await usersData.get?(uidUnban))?.name || "Unknown User");
 				message.reply(getLang("unbanSuccess", uidUnban, userName));
 				break;
 			}
@@ -204,7 +204,7 @@ module.exports = {
 				if (isNaN(num))
 					num = dataWarnOfUser.list.length - 1;
 
-				const userName = await usersData.getName(uid);
+				const userName = ((await usersData.get?(uid))?.name || "Unknown User");
 				if (num > dataWarnOfUser.list.length)
 					return message.reply(getLang("notEnoughWarn", userName, dataWarnOfUser.list.length));
 
@@ -253,7 +253,7 @@ module.exports = {
 
 				const times = dataWarnOfUser?.list.length ?? 1;
 
-				const userName = await usersData.getName(uid);
+				const userName = ((await usersData.get?(uid))?.name || "Unknown User");
 				if (times >= 3) {
 					message.reply(getLang("warnSuccess", userName, times, uid, reason, dateTime, prefix), () => {
 						api.removeUserFromGroup(uid, threadID, async (err) => {
@@ -308,7 +308,7 @@ module.exports = {
 						continue;
 					const { list } = dataWarnOfUser;
 					if (list.length >= 3) {
-						const userName = await usersData.getName(uid);
+						const userName = ((await usersData.get?(uid))?.name || "Unknown User");
 						hasBanned.push({
 							uid,
 							name: userName

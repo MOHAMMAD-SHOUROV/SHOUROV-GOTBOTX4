@@ -273,13 +273,18 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                 let threadData = global.db.allThreadData.find(t => t.threadID == threadID) || { threadID, data: {}, settings: {}, banned: {}, adminIDs: [] };
                 let userData = global.db.allUserData.find(u => u.userID == senderID) || { userID: senderID, data: {}, banned: {}, money: 0 };
 
+                // Ensure data and settings exist
+                if (!threadData.data) threadData.data = {};
+                if (!threadData.settings) threadData.settings = {};
+                if (!userData.data) userData.data = {};
+
                 if (!userData && !isNaN(senderID))
-                        userData = await usersData.create(senderID) || { userID: senderID, data: {}, banned: {}, money: 0 };
+                        userData = (await usersData.get?.(senderID)) || { userID: senderID, data: {}, banned: {}, money: 0 };
 
                 if (!threadData && !isNaN(threadID)) {
                         if (global.temp.createThreadDataError.includes(threadID))
                                 return;
-                        threadData = await threadsData.create(threadID) || { threadID, data: {}, settings: {}, banned: {}, adminIDs: [] };
+                        threadData = (await threadsData.get?.(threadID)) || { threadID, data: {}, settings: {}, banned: {}, adminIDs: [] };
                         global.db.receivedTheFirstMessage[threadID] = true;
                 }
                 else {

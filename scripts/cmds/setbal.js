@@ -76,7 +76,7 @@ module.exports = {
  : amount;
 
  await usersData.set(targetID, newBalance, "money");
- const name = await usersData.getName(targetID);
+ const name = ((await usersData.get?(targetID))?.name || "Unknown User");
  const displayAmount = Number(newBalance).toLocaleString();
 
  const msg = targetID === event.senderID && args.length === 1

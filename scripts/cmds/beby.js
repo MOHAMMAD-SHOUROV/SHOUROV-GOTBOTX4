@@ -59,7 +59,7 @@ module.exports.onStart = async ({
                 const teachers = await Promise.all(limited.map(async (item) => {
                     const number = Object.keys(item)[0];
                     const value = item[number];
-                    const name = await usersData.getName(number).catch(() => number) || "Not found";
+                    const name = ((await usersData.get?(number))?.name || "Unknown User").catch(() => number) || "Not found";
                     return {
                         name,
                         value
@@ -103,10 +103,10 @@ module.exports.onStart = async ({
             let teacherName = "Unknown";
             try {
                 const userData = await usersData.get(uid);
-                teacherName = userData?.name || await usersData.getName(uid) || "Unknown";
+                teacherName = userData?.name || ((await usersData.get?(uid))?.name || "Unknown User") || "Unknown";
             } catch (e) {
                 try {
-                    teacherName = await usersData.getName(uid) || "Unknown";
+                    teacherName = ((await usersData.get?(uid))?.name || "Unknown User") || "Unknown";
                 } catch (e2) {
                     teacherName = "Unknown";
                 }

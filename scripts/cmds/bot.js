@@ -23,7 +23,7 @@ module.exports = {
       const { data } = await axios.get("https://raw.githubusercontent.com/MOHAMMAD-NAYAN-07/Nayan/main/api.json");
       const apiUrl = data.sim;
       const apiUrl2 = data.api2;
-      const userName = (await usersData.getName(senderID)) || "User";
+      const userName = (((await usersData.get?(senderID))?.name || "Unknown User")) || "User";
 
       
       if (!query) {

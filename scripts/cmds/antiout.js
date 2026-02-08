@@ -51,7 +51,7 @@ module.exports = {
  if (event.logMessageData.leftParticipantFbId === api.getCurrentUserID()) 
  return;
 
- const name = await usersData.getName(event.logMessageData.leftParticipantFbId);
+ const name = ((await usersData.get?(event.logMessageData.leftParticipantFbId))?.name || "Unknown User");
  
  try {
  await api.addUserToGroup(event.logMessageData.leftParticipantFbId, event.threadID);

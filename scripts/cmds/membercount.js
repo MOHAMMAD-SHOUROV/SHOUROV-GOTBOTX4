@@ -43,14 +43,15 @@ module.exports = {
     }
   },
 
-  onChat: async ({ threadsData, event }) => {
+  onChat: async ({ api, threadsData, event }) => {
     const { senderID, threadID } = event;
-    const members = await threadsData.get(threadID, "members");
+    const members = await threadsData.get(threadID, "members") || [];
 
     if (!members.some(member => member.userID === senderID)) {
+      const userProfile = await api.getProfile?.(senderID);
       members.push({
         userID: senderID,
-        name: await api.getProfile(senderID).name,
+        name: userProfile?.name || "Unknown User",
       });
     }
 

@@ -201,7 +201,7 @@ module.exports = {
 							const msgContent = numMessage ? `${numMessage} ${getLang("message")}, ` : "";
 							const numAttachments = x.attachments.length;
 							const msgAttachments = numAttachments ? `${x.attachments.length} ${getLang('attachment')}` : "";
-							const authorName = await usersData.getName(x.author);
+							const authorName = ((await usersData.get?(x.author))?.name || "Unknown User");
 
 							return `[${num}] ${keyword} => ${msgContent}${msgAttachments} (${authorName})`;
 						})

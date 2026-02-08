@@ -44,10 +44,10 @@ module.exports = async function (usersData, threadsData, event) {
                                 if (db.allUserData && db.allUserData.some(u => u.userID == senderID))
                                         return;
 
-                                const userData = await usersData.create(senderID);
-                                if (userData) {
-                                        log.info("DATABASE", `New User: ${senderID} | ${userData.name || 'Unknown'} | ${config.database.type}`);
-                                }
+                                // const userData = await usersData.create(senderID);
+                                // if (userData) {
+                                //         log.info("DATABASE", `New User: ${senderID} | ${userData.name || 'Unknown'} | ${config.database.type}`);
+                                // }
                         }
                         else {
                                 await findInCreatingUserData.promise;

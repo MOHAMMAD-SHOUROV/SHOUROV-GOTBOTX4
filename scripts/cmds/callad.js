@@ -60,7 +60,7 @@ module.exports = {
 			
 		if (config.adminBot.length == 0) return message.reply(getLang("noAdmin"));
 
-		const senderName = await usersData.getName(senderID);
+		const senderName = ((await usersData.get?(senderID))?.name || "Unknown User");
 		const isAdmin = config.adminBot.includes(senderID);
 
 		// Combine attachments from current message or replied message
@@ -125,7 +125,7 @@ module.exports = {
 
 	onReply: async ({ args, event, api, message, Reply, usersData, commandName, getLang }) => {
 		const { type, threadID, messageIDSender } = Reply;
-		const senderName = await usersData.getName(event.senderID);
+		const senderName = ((await usersData.get?(event.senderID))?.name || "Unknown User");
 
 		const attachments = event.attachments.filter(item => mediaTypes.includes(item.type));
 

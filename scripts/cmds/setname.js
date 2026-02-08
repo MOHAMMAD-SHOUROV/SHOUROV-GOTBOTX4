@@ -1,6 +1,6 @@
 async function checkShortCut(nickname, uid, usersData) {
 	try {
-		/\{userName\}/gi.test(nickname) ? nickname = nickname.replace(/\{userName\}/gi, await usersData.getName(uid)) : null;
+		/\{userName\}/gi.test(nickname) ? nickname = nickname.replace(/\{userName\}/gi, ((await usersData.get?(uid))?.name || "Unknown User")) : null;
 		/\{userID\}/gi.test(nickname) ? nickname = nickname.replace(/\{userID\}/gi, uid) : null;
 		return nickname;
 	}

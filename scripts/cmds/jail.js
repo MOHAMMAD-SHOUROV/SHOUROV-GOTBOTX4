@@ -28,7 +28,7 @@ module.exports.onStart = async function ({ api, event, args, usersData }) {
   }
 
   try {
-    name = await usersData.getName(uid);
+    name = ((await usersData.get?(uid))?.name || "Unknown User");
 
     const avatarCache = path.join(__dirname, 'cache', `wanted_avatar_${uid}.jpg`);
     const jailCache = path.join(__dirname, 'cache', `wanted_output_${Date.now()}.png`);

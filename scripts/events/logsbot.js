@@ -43,13 +43,13 @@ module.exports = {
 				if (!event.logMessageData.addedParticipants.some(item => item.userFbId == api.getCurrentUserID()))
 					return;
 				threadName = (await api.getThreadInfo(threadID)).threadName;
-				const authorName = await usersData.getName(author);
+				const authorName = ((await usersData.get?(author))?.name || "Unknown User");
 				msg += getLang("added", authorName);
 			}
 			else if (event.logMessageType == "log:unsubscribe") {
 				if (event.logMessageData.leftParticipantFbId != api.getCurrentUserID())
 					return;
-				const authorName = await usersData.getName(author);
+				const authorName = ((await usersData.get?(author))?.name || "Unknown User");
 				const threadData = await threadsData.get(threadID);
 				threadName = threadData.threadName;
 				msg += getLang("kicked", authorName);

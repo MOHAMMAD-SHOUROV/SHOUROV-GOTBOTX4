@@ -27,7 +27,7 @@ module.exports = {
     const id1 = event.senderID;
     let name1;
     try {
-      name1 = await usersData.getName(id1);
+      name1 = ((await usersData.get?(id1))?.name || "Unknown User");
       if (!name1) throw new Error("No name found");
     } catch {
       const info = await api.getUserInfo(id1);
@@ -58,7 +58,7 @@ module.exports = {
 
     let name2;
     try {
-      name2 = await usersData.getName(id2);
+      name2 = ((await usersData.get?(id2))?.name || "Unknown User");
       if (!name2) throw new Error("No name found");
     } catch {
       const info = await api.getUserInfo(id2);

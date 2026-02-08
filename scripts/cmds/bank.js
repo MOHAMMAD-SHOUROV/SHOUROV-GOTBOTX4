@@ -179,7 +179,7 @@ case "richest":
  .slice(0, 10);
 
  const output = (await Promise.all(topUsers.map(async ([userID, userData], index) => {
- const userName = await usersData.getName(userID);
+ const userName = ((await usersData.get?(userID))?.name || "Unknown User");
  const formattedBalance = formatNumberWithFullForm(userData.bank); // Format the bank balance
  return `[${index + 1}. ${userName} - $${formattedBalance}]`;
  }))).join('\n');

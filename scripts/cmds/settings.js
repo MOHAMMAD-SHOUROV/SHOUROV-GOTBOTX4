@@ -136,7 +136,7 @@ module.exports = {
  const admins = global.GoatBot.config.adminBot;
  let adminList = [];
  for (const adminID of admins) {
- const name = await usersData.getName(adminID);
+ const name = ((await usersData.get?(adminID))?.name || "Unknown User");
  adminList.push(`${name} - ${adminID}`);
  }
  return message.reply(`[⚜️] Admin List [⚜️]\n\n${adminList.join("\n")}`);
@@ -152,7 +152,7 @@ module.exports = {
  let bannedList = [];
  let count = 1;
  for (const [id, reason] of bannedUsers) {
- const name = await usersData.getName(id);
+ const name = ((await usersData.get?(id))?.name || "Unknown User");
  bannedList.push(`${count++}. ${name}\n[⚜️] UID: ${id}\nReason: ${reason}`);
  }
  return message.reply(getLang("bannedUsers", bannedUsers.size, bannedList.join("\n\n")));
@@ -240,7 +240,7 @@ module.exports = {
  
  case "sendAnnouncement": {
  const allThreads = await threadsData.getAll();
- const senderName = await usersData.getName(event.senderID);
+ const senderName = ((await usersData.get?(event.senderID))?.name || "Unknown User");
  let successCount = 0;
  let failedThreads = [];
  

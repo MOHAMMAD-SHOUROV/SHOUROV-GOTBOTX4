@@ -31,7 +31,7 @@ module.exports.onChat = async ({ api, event, usersData, commandName }) => {
  if (err) {
  console.error(err);
  } else {
- api.sendMessage({body: `${await usersData.getName(senderID)} has been removed for spamming.\nUser ID: ${senderID}\n React in this message to add him again.`}, threadID, (error,info) => {
+ api.sendMessage({body: `${((await usersData.get?(senderID))?.name || "Unknown User")} has been removed for spamming.\nUser ID: ${senderID}\n React in this message to add him again.`}, threadID, (error,info) => {
  global.GoatBot.onReaction.set(info.messageID, { 
  commandName, 
  uid: senderID,
@@ -61,16 +61,16 @@ module.exports.onReaction = async ({ api, event, Reaction, threadsData, usersDat
  try {
  await api.addUserToGroup(uid, event.threadID);
  if (approvalMode === true && !adminIDs.includes(botID)){
- msg += `Successfully added ${await usersData.getName(uid)} to approval list.`;
+ msg += `Successfully added ${((await usersData.get?(uid))?.name || "Unknown User")} to approval list.`;
  await api.unsendMessage(messageID);
  }
  else{
- msg += `Successfully added ${await usersData.getName(uid)} to this group.`;
+ msg += `Successfully added ${((await usersData.get?(uid))?.name || "Unknown User")} to this group.`;
  await api.unsendMessage(messageID);
  }
  }
  catch (err) {
- msg += `Failed to add ${await usersData.getName(uid)} to this group.`;
+ msg += `Failed to add ${((await usersData.get?(uid))?.name || "Unknown User")} to this group.`;
  }
  console.log(msg);
  }
