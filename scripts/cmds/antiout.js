@@ -2,7 +2,7 @@ module.exports = {
   config: {
     name: "antiout",
     version: "1.1",
-    author: "Chitron Bhattacharjee (Fixed)",
+    author: "alihsan shourov (Fixed)",
     countDown: 5,
     role: 1,
     shortDescription: {
