@@ -23,23 +23,33 @@ module.exports = {
 
   onChat: async ({ api, event, usersData }) => {
     try {
-      if (!event.senderID || event.senderID === api.getCurrentUserID()) return;
-      if (!event.body) return;
+      // ignore bot & empty msg
+      if (!event.senderID) return;
+      if (event.senderID === api.getCurrentUserID()) return;
+      if (!event.body || event.body.trim().length < 1) return;
 
       const uid = event.senderID;
       const data = loadData();
 
       if (!data[uid]) {
-        data[uid] = { msg: 0, level: 1 };
+        data[uid] = {
+          msg: 0,
+          level: 1
+        };
       }
 
+      // increase message count
       data[uid].msg += 1;
 
-      // Check level up
-      if (data[uid].msg % MSG_PER_LEVEL === 0) {
-        data[uid].level += 1;
+      // calculate level properly
+      const expectedLevel =
+        Math.floor(data[uid].msg / MSG_PER_LEVEL) + 1;
 
-        // Find top chatter
+      // level up only once
+      if (expectedLevel > data[uid].level) {
+        data[uid].level = expectedLevel;
+
+        // find top chatter
         let topUID = uid;
         for (const id in data) {
           if (data[id].msg > data[topUID].msg) {
@@ -47,8 +57,15 @@ module.exports = {
           }
         }
 
-        const name = await usersData.getName(uid) || "User";
-        const topName = await usersData.getName(topUID) || "Unknown";
+        const name =
+          (await usersData.get?(uid))?.name ||
+          (await api.getUserInfo(uid))?.[uid]?.name ||
+          "User";
+
+        const topName =
+          (await usersData.get?(topUID))?.name ||
+          (await api.getUserInfo(topUID))?.[topUID]?.name ||
+          "Unknown";
 
         await api.sendMessage(
           {
@@ -71,8 +88,9 @@ module.exports = {
       }
 
       saveData(data);
+
     } catch (err) {
-      console.log("LevelSystem Error:", err.message);
+      console.log("LevelSystem Error:", err);
     }
   }
 };
