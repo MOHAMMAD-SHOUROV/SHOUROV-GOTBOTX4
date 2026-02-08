@@ -2,10 +2,10 @@ const fs = require("fs");
 const path = require("path");
 const { createCanvas, loadImage, registerFont } = require("canvas");
 
-// ✅ Register Bangla font
+// 🔤 Register Bangla Font (Regular)
 registerFont(
-  path.join(__dirname, "fonts/NotoSansBengali-Bold.ttf"),
-  { family: "BanglaFont" }
+  path.join(__dirname, "fonts/NotoSansBengali-Regular.ttf"),
+  { family: "BanglaRegular" }
 );
 
 module.exports = {
@@ -13,12 +13,12 @@ module.exports = {
     name: "board",
     aliases: ["back"],
     version: "1.1",
-    author: "alihsan Shourov",
+    author: "Alihsan Shourov",
     role: 0,
-    shortDescription: "Write name/text on board",
-    longDescription: "A person holding a white board with Bangla/English text",
+    shortDescription: "Write Bangla text on board",
+    longDescription: "Person holding board with Bangla text",
     category: "fun",
-    guide: "/board <text>"
+    guide: "/board <বাংলা লেখা>"
   },
 
   onStart: async function ({ api, event, args }) {
@@ -26,7 +26,7 @@ module.exports = {
       const text = args.join(" ");
       if (!text) {
         return api.sendMessage(
-          "❌ লেখা দিন\nExample: /board সৌরভ",
+          "❌ লেখা দিন\nউদাহরণ: /board আমি বাংলায় লিখি",
           event.threadID,
           event.messageID
         );
@@ -35,29 +35,32 @@ module.exports = {
       const canvas = createCanvas(800, 800);
       const ctx = canvas.getContext("2d");
 
-      // Background image
-      const bg = await loadImage("https://files.catbox.moe/mspgp7.png");
+      // 🖼 Background (person holding board)
+      const bg = await loadImage(
+        "https://files.catbox.moe/mspgp7.png"
+      );
       ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-      // Text style (Bangla supported)
+      // ✍️ Bangla text style
+      ctx.font = "bold 44px BanglaRegular";
       ctx.fillStyle = "#000000";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = "bold 46px BanglaFont";
 
-      // ✅ Board text area (nicher দিকে নামানো)
-      const maxWidth = 520;
-      const startY = 470; // ← আগের চেয়ে নিচে
-      const lineHeight = 55;
+      // ⬇️ Text একটু নিচে নামানো
+      const textX = canvas.width / 2;
+      const textY = 480; // ← আগের চেয়ে নিচে
 
-      wrapText(ctx, text, canvas.width / 2, startY, maxWidth, lineHeight);
+      // Multi-line support
+      wrapText(ctx, text, textX, textY, 500, 52);
 
+      // 💾 Save image
       const outPath = path.join(__dirname, "board_output.png");
       fs.writeFileSync(outPath, canvas.toBuffer("image/png"));
 
       await api.sendMessage(
         {
-          body: "🪧 বোর্ড তৈরি করা হয়েছে",
+          body: "🪧 বোর্ড প্রস্তুত!",
           attachment: fs.createReadStream(outPath)
         },
         event.threadID,
@@ -74,24 +77,24 @@ module.exports = {
   }
 };
 
-// 🔹 Auto text wrap function
+// 🔧 Text wrap function (Bangla safe)
 function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
   const words = text.split(" ");
   let line = "";
-  let currentY = y;
+  let offsetY = 0;
 
-  for (let i = 0; i < words.length; i++) {
-    const testLine = line + words[i] + " ";
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + " ";
     const metrics = ctx.measureText(testLine);
     const testWidth = metrics.width;
 
-    if (testWidth > maxWidth && i > 0) {
-      ctx.fillText(line, x, currentY);
-      line = words[i] + " ";
-      currentY += lineHeight;
+    if (testWidth > maxWidth && n > 0) {
+      ctx.fillText(line, x, y + offsetY);
+      line = words[n] + " ";
+      offsetY += lineHeight;
     } else {
       line = testLine;
     }
   }
-  ctx.fillText(line, x, currentY);
+  ctx.fillText(line, x, y + offsetY);
 }
