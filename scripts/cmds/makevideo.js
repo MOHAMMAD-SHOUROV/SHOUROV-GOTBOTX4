@@ -3,7 +3,8 @@ const path = require("path");
 const axios = require("axios");
 const { exec } = require("child_process");
 
-const FFMPEG_PATH = "../../ffmpeg/ffmpeg";
+// ffmpeg binary path (root/ffmpeg/ffmpeg)
+const FFMPEG_PATH = path.join(__dirname, "../../ffmpeg/ffmpeg");
 
 module.exports = {
   config: {
@@ -18,24 +19,25 @@ module.exports = {
 
   onStart: async ({ api, event, args }) => {
     try {
-      // ✅ duration check
+      /* ================= duration ================= */
       const duration = parseInt(args[0]) || 20;
       if (![10, 20, 30].includes(duration)) {
         return api.sendMessage(
-          "❌ Duration must be 10 / 20 / 30 seconds\nExample: reply + /mv 20",
+          "❌ Duration must be 10 / 20 / 30 seconds\nExample: mv 20",
           event.threadID,
           event.messageID
         );
       }
 
-      // ✅ must reply to image
+      /* ================= check reply image ================= */
       if (
         !event.messageReply ||
         !event.messageReply.attachments ||
+        !event.messageReply.attachments[0] ||
         event.messageReply.attachments[0].type !== "photo"
       ) {
         return api.sendMessage(
-          "📸 Reply to an image first\nExample: reply image + /mv 20",
+          "📸 Reply to an IMAGE to make video\nExample: reply + mv 20",
           event.threadID,
           event.messageID
         );
@@ -43,28 +45,28 @@ module.exports = {
 
       const imgUrl = event.messageReply.attachments[0].url;
 
-      // ✅ temp folder
+      /* ================= tmp folder ================= */
       const tmpDir = path.join(__dirname, "tmp");
-      if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
+      if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
 
       const imgPath = path.join(tmpDir, `img_${event.senderID}.jpg`);
       const audioPath = path.join(tmpDir, `audio_${event.senderID}.mp3`);
       const outPath = path.join(tmpDir, `video_${event.senderID}.mp4`);
 
-      // 🎵 trending song (mp3)
-      const songUrl = "https://files.catbox.moe/2dqwbl.mp3";
+      /* ================= trending song (MP3 only) ================= */
+      const songUrl = "https://files.catbox.moe/6k2x5r.mp3";
 
-      // download image
-      const img = await axios.get(imgUrl, { responseType: "arraybuffer" });
-      fs.writeFileSync(imgPath, img.data);
+      /* ================= download image ================= */
+      const imgRes = await axios.get(imgUrl, { responseType: "arraybuffer" });
+      fs.writeFileSync(imgPath, imgRes.data);
 
-      // download audio
-      const song = await axios.get(songUrl, { responseType: "arraybuffer" });
-      fs.writeFileSync(audioPath, song.data);
+      /* ================= download audio ================= */
+      const audioRes = await axios.get(songUrl, { responseType: "arraybuffer" });
+      fs.writeFileSync(audioPath, audioRes.data);
 
-      api.sendMessage("🎬 Creating video... please wait", event.threadID);
+      await api.sendMessage("🎬 Creating video... please wait", event.threadID);
 
-      // ✅ ffmpeg command (IMPORTANT: use FFMPEG_PATH)
+      /* ================= ffmpeg command ================= */
       const cmd = `
 "${FFMPEG_PATH}" -y -loop 1 -i "${imgPath}" -i "${audioPath}" \
 -filter_complex "
@@ -78,7 +80,7 @@ fade=t=out:st=${duration - 1}:d=1
 
       exec(cmd, async (err) => {
         if (err) {
-          console.log(err);
+          console.log("FFMPEG ERROR:", err);
           return api.sendMessage("❌ Video creation failed", event.threadID);
         }
 
@@ -90,15 +92,15 @@ fade=t=out:st=${duration - 1}:d=1
           event.threadID
         );
 
-        // cleanup
+        /* ================= cleanup ================= */
         [imgPath, audioPath, outPath].forEach(f => {
           if (fs.existsSync(f)) fs.unlinkSync(f);
         });
       });
 
     } catch (e) {
-      console.log(e);
-      api.sendMessage("❌ Something went wrong", event.threadID);
+      console.log("MAKEVIDEO ERROR:", e);
+      api.sendMessage("❌ Something went wrong (check logs)", event.threadID);
     }
   }
 };
