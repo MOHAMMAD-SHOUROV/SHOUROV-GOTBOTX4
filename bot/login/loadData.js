@@ -8,7 +8,17 @@ module.exports = async function (api, createLine) {
         const controllerPath = path.join(process.cwd(), 'neokex_fca_database/controller/index.js');
         if (!require('fs').existsSync(controllerPath)) {
             log.warn('DATABASE', 'Controller not found, skipping database initialization');
-            return { threadsData: { create: () => {}, refreshInfo: () => {} }, usersData: {}, dashBoardData: {}, globalData: {} };
+            return { 
+                threadModel: null, 
+                userModel: null, 
+                dashBoardModel: null, 
+                globalModel: null, 
+                threadsData: { create: async () => ({}), refreshInfo: async () => ({}), get: async () => ([]), set: async () => ({}), getAll: async () => ([]) }, 
+                usersData: { get: async () => ({}), set: async () => ({}), getAll: async () => ([]) }, 
+                dashBoardData: { get: async () => ({}), set: async () => ({}), getAll: async () => ([]) }, 
+                globalData: { get: async () => ([]), set: async () => ({}), getAll: async () => ([]) }, 
+                sequelize: null 
+            };
         }
         const controller = await require(controllerPath)(api); // data is loaded here
         const { threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData, sequelize } = controller;
