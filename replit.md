@@ -32,4 +32,5 @@ GoatBot V2 is a Facebook Messenger chatbot built with Node.js. It uses a persona
 - **GoatBot Server**: `npm start` - Runs the bot (console output)
 
 ## Recent Changes
+- 2026-02-08: Completed import migration - all packages installed, workflow configured and verified running
 - 2026-02-07: Initial import to Replit environment, installed system dependencies (cairo, pango, etc.) for canvas support
