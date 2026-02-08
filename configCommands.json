@@ -6,6 +6,10 @@
   },
   "envCommands": {
     "daily": {
+      "rewardDay1": {
+        "coin": 100,
+        "exp": 10
+      },
       "rewardFirstDay": {
         "coin": 100,
         "exp": 10
@@ -25,18 +29,11 @@
     },
     "dhbc": {
       "reward": 1000
-    },
-    "datetime": {},
-    "wanted": {
-      "deltaNext": 5
     }
   },
   "envEvents": {
     "logsbot": {
       "allow": true
     }
-  },
-  "commandUnload": [
-    "alldl.js"
-  ]
+  }
 }
