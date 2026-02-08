@@ -31,7 +31,7 @@ module.exports = {
 
       // background image (person holding board)
       const bg = await loadImage(
-        "https://i.imgur.com/7k9XK6r.png"
+        "https://files.catbox.moe/mspgp7.png"
       ); 
       // ↑ এটা free stock image, board visible
 
