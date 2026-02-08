@@ -44,18 +44,19 @@ function validJSON(pathDir) {
 	}
 }
 
-const dirConfig = path.normalize(`${__dirname}/Shourov.json`);
-const dirConfigCommands = path.normalize(`${__dirname}/configCommands.json`);
-const dirAccount = path.normalize(`${__dirname}/Shourov.txt`);
+const { NODE_ENV } = process.env;
+const dirConfig = path.normalize(`${__dirname}/Shourov${['production', 'development'].includes(NODE_ENV) ? '.dev.json' : '.json'}`);
+const dirConfigCommands = path.normalize(`${__dirname}/configCommands${['production', 'development'].includes(NODE_ENV) ? '.dev.json' : '.json'}`);
+const dirAccount = `${__dirname}/Shourovt${['production', 'development'].includes(NODE_ENV) ? '.dev.txt' : '.txt'}`;
 
 for (const pathDir of [dirConfig, dirConfigCommands]) {
-        try {
-                validJSON(pathDir);
-        }
-        catch (err) {
-                log.error("CONFIG", `Invalid JSON file "${pathDir.replace(__dirname, "")}":\n${err.message.split("\n").map(line => `  ${line}`).join("\n")}\nPlease fix it and restart bot`);
-                process.exit(0);
-        }
+	try {
+		validJSON(pathDir);
+	}
+	catch (err) {
+		log.error("CONFIG", `Invalid JSON file "${pathDir.replace(__dirname, "")}":\n${err.message.split("\n").map(line => `  ${line}`).join("\n")}\nPlease fix it and restart bot`);
+		process.exit(0);
+	}
 }
 const config = require(dirConfig);
 if (config.whiteListMode?.whiteListIds && Array.isArray(config.whiteListMode.whiteListIds))
@@ -176,11 +177,11 @@ global.temp = {
 // ———————————————— DASHBOARD ROUTES ———————————————— //
 
 app.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname, 'public/index.html'));
+	res.sendFile(path.join(__dirname, 'public/Shourov.html'));
 });
 
 app.get('/appstate', (req, res) => {
-	res.sendFile(path.join(__dirname, 'public/appstate.html'));
+	res.sendFile(path.join(__dirname, 'public/Shourovstate.html'));
 });
 
 app.get("/api/stats", (req, res) => {
