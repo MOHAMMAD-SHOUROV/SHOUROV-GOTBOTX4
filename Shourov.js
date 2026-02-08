@@ -44,19 +44,18 @@ function validJSON(pathDir) {
 	}
 }
 
-const { NODE_ENV } = process.env;
-const dirConfig = path.normalize(`${__dirname}/Shourov${['production', 'development'].includes(NODE_ENV) ? '.json'}`);
-const dirConfigCommands = path.normalize(`${__dirname}/configCommands${['production', 'development'].includes(NODE_ENV) ? '.json'}`);
-const dirAccount = `${__dirname}/Shourov${['production', 'development'].includes(NODE_ENV) ? '.txt'}`;
+const dirConfig = path.normalize(`${__dirname}/Shourov.json`);
+const dirConfigCommands = path.normalize(`${__dirname}/configCommands.json`);
+const dirAccount = path.normalize(`${__dirname}/Shourov.txt`);
 
 for (const pathDir of [dirConfig, dirConfigCommands]) {
-	try {
-		validJSON(pathDir);
-	}
-	catch (err) {
-		log.error("CONFIG", `Invalid JSON file "${pathDir.replace(__dirname, "")}":\n${err.message.split("\n").map(line => `  ${line}`).join("\n")}\nPlease fix it and restart bot`);
-		process.exit(0);
-	}
+        try {
+                validJSON(pathDir);
+        }
+        catch (err) {
+                log.error("CONFIG", `Invalid JSON file "${pathDir.replace(__dirname, "")}":\n${err.message.split("\n").map(line => `  ${line}`).join("\n")}\nPlease fix it and restart bot`);
+                process.exit(0);
+        }
 }
 const config = require(dirConfig);
 if (config.whiteListMode?.whiteListIds && Array.isArray(config.whiteListMode.whiteListIds))
