@@ -1,16 +1,22 @@
 const fs = require("fs");
 const path = require("path");
-const { createCanvas, loadImage } = require("canvas");
+const { createCanvas, loadImage, registerFont } = require("canvas");
+
+// ✅ Register Bangla font
+registerFont(
+  path.join(__dirname, "fonts/NotoSansBengali-Bold.ttf"),
+  { family: "BanglaFont" }
+);
 
 module.exports = {
   config: {
     name: "board",
     aliases: ["back"],
-    version: "1.0",
+    version: "1.1",
     author: "alihsan Shourov",
     role: 0,
-    shortDescription: "Write name on board",
-    longDescription: "A person holding a white board with custom text",
+    shortDescription: "Write name/text on board",
+    longDescription: "A person holding a white board with Bangla/English text",
     category: "fun",
     guide: "/board <text>"
   },
@@ -20,7 +26,7 @@ module.exports = {
       const text = args.join(" ");
       if (!text) {
         return api.sendMessage(
-          "❌ Please give a name or text.\nExample: /board Shourov",
+          "❌ লেখা দিন\nExample: /board সৌরভ",
           event.threadID,
           event.messageID
         );
@@ -29,30 +35,29 @@ module.exports = {
       const canvas = createCanvas(800, 800);
       const ctx = canvas.getContext("2d");
 
-      // background image (person holding board)
-      const bg = await loadImage(
-        "https://files.catbox.moe/mspgp7.png"
-      ); 
-      // ↑ এটা free stock image, board visible
-
+      // Background image
+      const bg = await loadImage("https://files.catbox.moe/mspgp7.png");
       ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-      // board text style
-      ctx.font = "bold 48px Arial";
+      // Text style (Bangla supported)
       ctx.fillStyle = "#000000";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+      ctx.font = "bold 46px BanglaFont";
 
-      // board position (adjustable)
-      ctx.fillText(text, canvas.width / 2, 420);
+      // ✅ Board text area (nicher দিকে নামানো)
+      const maxWidth = 520;
+      const startY = 470; // ← আগের চেয়ে নিচে
+      const lineHeight = 55;
 
-      // save file
+      wrapText(ctx, text, canvas.width / 2, startY, maxWidth, lineHeight);
+
       const outPath = path.join(__dirname, "board_output.png");
       fs.writeFileSync(outPath, canvas.toBuffer("image/png"));
 
       await api.sendMessage(
         {
-          body: "🪧 Your board is ready!",
+          body: "🪧 বোর্ড তৈরি করা হয়েছে",
           attachment: fs.createReadStream(outPath)
         },
         event.threadID,
@@ -62,9 +67,31 @@ module.exports = {
     } catch (err) {
       console.error(err);
       api.sendMessage(
-        "❌ Something went wrong while creating the board image.",
+        "❌ বোর্ড তৈরি করতে সমস্যা হয়েছে",
         event.threadID
       );
     }
   }
 };
+
+// 🔹 Auto text wrap function
+function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = text.split(" ");
+  let line = "";
+  let currentY = y;
+
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + " ";
+    const metrics = ctx.measureText(testLine);
+    const testWidth = metrics.width;
+
+    if (testWidth > maxWidth && i > 0) {
+      ctx.fillText(line, x, currentY);
+      line = words[i] + " ";
+      currentY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, currentY);
+}
