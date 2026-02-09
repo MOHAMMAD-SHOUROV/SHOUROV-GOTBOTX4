@@ -22,20 +22,7 @@ global.db = {
 };
 
 module.exports = async function () {
-        const controllerPath = path.join(process.cwd(), "shourov_fca_database/controller/index.js");
-        if (!require("fs").existsSync(controllerPath)) {
-                return {
-                        threadModel: null,
-                        userModel: null,
-                        dashBoardModel: null,
-                        globalModel: null,
-                        threadsData: [],
-                        usersData: [],
-                        dashBoardData: [],
-                        globalData: []
-                };
-        }
-        const controller = await require(controllerPath)(null); // data is loaded here
+        const controller = await require(path.join(process.cwd(), "shourov_fca_database/controller/index.js"))(null); // data is loaded here
         const { threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData } = controller;
         return {
                 threadModel,
