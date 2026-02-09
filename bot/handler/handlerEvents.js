@@ -371,9 +371,9 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                                 }
                         }
                         const dateNow = Date.now();
-                        const args = body.slice(prefix.length).trim().split(/ +/);
+                        const args = body.slice(prefix.length).trim().split(/ +/).filter(Boolean);
                         // ————————————  CHECK HAS COMMAND ——————————— //
-                        let commandName = args.shift().toLowerCase();
+                        let commandName = (args.shift() || "").toLowerCase();
                         let command = GoatBot.commands.get(commandName) || GoatBot.commands.get(GoatBot.aliases.get(commandName));
                         // ———————— CHECK ALIASES SET BY GROUP ———————— //
                         const threadDataData = threadData?.data || {};
@@ -559,7 +559,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                 */
                 async function onChat() {
                         const allOnChat = GoatBot.onChat || [];
-                        const args = body ? body.split(/ +/) : [];
+                        const args = (body ? body.split(/ +/) : []).filter(Boolean);
                         for (const key of allOnChat) {
                                 const command = GoatBot.commands.get(key);
                                 if (!command)
@@ -620,7 +620,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                         const allOnAnyEvent = GoatBot.onAnyEvent || [];
                         let args = [];
                         if (typeof event.body == "string" && event.body.startsWith(prefix))
-                                args = event.body.split(/ +/);
+                                args = event.body.split(/ +/).filter(Boolean);
 
                         for (const key of allOnAnyEvent) {
                                 if (typeof key !== "string")
@@ -673,7 +673,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                 */
                 async function onFirstChat() {
                         const allOnFirstChat = GoatBot.onFirstChat || [];
-                        const args = body ? body.split(/ +/) : [];
+                        const args = (body ? body.split(/ +/) : []).filter(Boolean);
 
                         for (const itemOnFirstChat of allOnFirstChat) {
                                 const { commandName, threadIDsChattedFirstTime } = itemOnFirstChat;
@@ -795,7 +795,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                         try {
                                 if (!command)
                                         throw new Error(`Cannot find command with commandName: ${commandName}`);
-                                const args = body ? body.split(/ +/) : [];
+                                const args = (body ? body.split(/ +/) : []).filter(Boolean);
                                 createMessageSyntaxError(commandName);
                                 if (isBannedOrOnlyAdmin(userData, threadData, senderID, threadID, isGroup, commandName, message, langCode))
                                         return;
