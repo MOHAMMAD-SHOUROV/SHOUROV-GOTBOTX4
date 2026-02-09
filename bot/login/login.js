@@ -225,7 +225,11 @@ function checkAndTrimString(string) {
 }
 
 function filterKeysAppState(appState) {
-        return appState.filter(item => ["c_user", "xs", "datr", "fr", "sb", "i_user"].includes(item.key));
+        const allowedKeys = ["c_user", "xs", "datr", "fr", "sb", "i_user", "dbln", "ps_l", "ps_n", "pas", "vpd", "locale", "wl_cbv", "fbl_st", "presence", "wd", "m_pixel_ratio", "dpr", "m_page_res"];
+        return appState.filter(item => {
+                const key = item.key || item.name;
+                return key && (allowedKeys.includes(key) || !["x-referer"].includes(key));
+        });
 }
 
 global.responseUptimeCurrent = responseUptimeSuccess;
@@ -482,16 +486,16 @@ async function getAppStateToLogin(loginWithEmail) {
                                         error.name = "ACCOUNT_ERROR";
                                         throw error;
                                 }
-                                appState = appState
-                                        .map(item => ({
-                                                ...item,
-                                                domain: "facebook.com",
-                                                path: "/",
-                                                hostOnly: false,
-                                                creation: new Date().toISOString(),
-                                                lastAccessed: new Date().toISOString()
-                                        }))
-                                        .filter(i => i.key && i.value && i.key != "x-referer");
+                                                                appState = appState
+                                                                                .map(item => ({
+                                                                                                ...item,
+                                                                                                domain: item.domain || "facebook.com",
+                                                                                                path: item.path || "/",
+                                                                                                hostOnly: item.hostOnly || false,
+                                                                                                creation: item.creation || new Date().toISOString(),
+                                                                                                lastAccessed: item.lastAccessed || new Date().toISOString()
+                                                                                }))
+                                                                                .filter(i => (i.key || i.name) && i.value && (i.key || i.name) != "x-referer");
                         }
                 }
         }
