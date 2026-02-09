@@ -1,6 +1,6 @@
 const path = require("path");
 
-const dirConfig = path.join(`${__dirname}/../Shourov.json`);
+const dirConfig = path.join(`${__dirname}/../config.json`);
 const dirConfigCommands = path.join(`${__dirname}/../configCommands.json`);
 
 global.GoatBot = {
@@ -22,7 +22,7 @@ global.db = {
 };
 
 module.exports = async function () {
-        const controller = await require(path.join(process.cwd(), "shourov_fca_database/controller/index.js"))(null); // data is loaded here
+        const controller = await require(path.join(process.cwd(), "neokex_fca_database/controller/index.js"))(null); // data is loaded here
         const { threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData } = controller;
         return {
                 threadModel,
