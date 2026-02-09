@@ -278,11 +278,11 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                 if (!threadData.settings) threadData.settings = {};
                 if (!userData.data) userData.data = {};
 
-// ===== FIX rankup undefined issue =====
+// ===== FIX rankup sendRankup undefined =====
 if (typeof threadData.settings.sendRankup !== "boolean") {
     threadData.settings.sendRankup = false;
+    await threadsData.set(threadID, false, "settings.sendRankup");
 }
-
                 if (!userData && !isNaN(senderID))
                         userData = (await usersData.get?.(senderID)) || { userID: senderID, data: {}, banned: {}, money: 0 };
 
