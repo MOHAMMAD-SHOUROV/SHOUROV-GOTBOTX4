@@ -20,7 +20,7 @@ GoatBot V2 is a Facebook Messenger chatbot built with Node.js. It uses a persona
 - **Config**: `configCommands.json`, `fca-config.json` - bot configuration
 
 ## Key Dependencies
-- `fca-neokex` - Facebook Chat API
+- `shourov-fca` - Facebook Chat API
 - `express` - Web server for dashboard
 - `mongoose` - MongoDB driver
 - `sqlite3` / `sequelize` - SQLite database
@@ -32,5 +32,6 @@ GoatBot V2 is a Facebook Messenger chatbot built with Node.js. It uses a persona
 - **GoatBot Server**: `npm start` - Runs the bot (console output)
 
 ## Recent Changes
+- 2026-02-09: Replaced fca-neokex with shourov-fca and updated database references to shourov_fca_database.
 - 2026-02-08: Completed import migration - all packages installed, workflow configured and verified running
 - 2026-02-07: Initial import to Replit environment, installed system dependencies (cairo, pango, etc.) for canvas support

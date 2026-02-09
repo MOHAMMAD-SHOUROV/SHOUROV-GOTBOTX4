@@ -22,7 +22,7 @@ global.db = {
 };
 
 module.exports = async function () {
-        const controller = await require(path.join(process.cwd(), "neokex_fca_database/controller/index.js"))(null); // data is loaded here
+        const controller = await require(path.join(process.cwd(), "shourov_fca_database/controller/index.js"))(null); // data is loaded here
         const { threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData } = controller;
         return {
                 threadModel,
