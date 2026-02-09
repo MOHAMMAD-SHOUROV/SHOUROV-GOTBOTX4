@@ -5,7 +5,7 @@ const { log, createOraDots, getText } = global.utils;
 module.exports = async function (api, createLine) {
         // ———————————————————— LOAD DATA ———————————————————— //
         console.log(chalk.hex("#f5ab00")(createLine("DATABASE")));
-        const controllerPath = path.join(process.cwd(), 'shourov_fca_database/controller/index.js');
+        const controllerPath = path.join(process.cwd(), 'neokex_fca_database/controller/index.js');
         if (!require('fs').existsSync(controllerPath)) {
             log.warn('DATABASE', 'Controller not found, skipping database initialization');
             return { 
