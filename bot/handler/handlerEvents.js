@@ -278,11 +278,15 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                 if (!threadData.settings) threadData.settings = {};
                 if (!userData.data) userData.data = {};
 
-// ===== FIX rankup sendRankup undefined =====
-if (typeof threadData.settings.sendRankup !== "boolean") {
-    threadData.settings.sendRankup = false;
-    await threadsData.set(threadID, false, "settings.sendRankup");
-}
+                // ===== GLOBAL DATA INITIALIZATION =====
+                if (typeof threadData.settings.sendRankup !== "boolean") {
+                    threadData.settings.sendRankup = false;
+                    await threadsData.set(threadID, false, "settings.sendRankup");
+                }
+                if (!threadData.data.rankup) threadData.data.rankup = {};
+                if (threadData.data.rankup.message === undefined) threadData.data.rankup.message = null;
+                if (!Array.isArray(threadData.data.rankup.attachments)) threadData.data.rankup.attachments = [];
+                // ======================================
                 if (!userData && !isNaN(senderID))
                         userData = (await usersData.get?.(senderID)) || { userID: senderID, data: {}, banned: {}, money: 0 };
 

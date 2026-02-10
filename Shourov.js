@@ -1,3 +1,7 @@
+if (typeof global.File === "undefined") {
+  global.File = class File {};
+}
+
 process.on('unhandledRejection', error => console.log(error));
 process.on('uncaughtException', error => console.log(error));
 

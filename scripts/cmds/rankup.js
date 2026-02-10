@@ -46,11 +46,12 @@ module.exports = {
 
         onChat: async function ({ api, threadsData, usersData, event, message, getLang }) {
                 const threadData = await threadsData.get(event.threadID);
+                if (!threadData?.settings) return;
                 const sendRankup = threadData.settings.sendRankup;
                 if (!sendRankup)
                         return;
                 const userData = await usersData.get(event.senderID);
-                if (!userData) return;
+                if (!userData || typeof userData.exp !== "number") return;
                 const { exp } = userData;
                 const currentLevel = expToLevel(exp);
                 if (currentLevel > expToLevel(exp - 1)) {
@@ -64,10 +65,10 @@ module.exports = {
                                         .replace(/{currentRank}/g, currentLevel);
                                 if (customMessage.includes("{userNameTag}")) {
                                         isTag = true;
-                                        customMessage = customMessage.replace(/{userNameTag}/g, `@${userData.name}`);
+                                        customMessage = customMessage.replace(/{userNameTag}/g, `@${userData.name || "User"}`);
                                 }
                                 else {
-                                        customMessage = customMessage.replace(/{userName}/g, userData.name);
+                                        customMessage = customMessage.replace(/{userName}/g, userData.name || "User");
                                 }
 
                                 formMessage.body = customMessage;
@@ -76,7 +77,7 @@ module.exports = {
                                 formMessage.body = getLang("notiMessage", currentLevel);
                         }
 
-                        if (threadData.data.rankup?.attachments?.length > 0) {
+                        if (threadData.data?.rankup?.attachments?.length > 0) {
                                 const files = threadData.data.rankup.attachments;
                                 const attachments = files.reduce((acc, file) => {
                                         acc.push(drive.getFile(file, "stream"));
