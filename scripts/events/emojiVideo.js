@@ -5,7 +5,7 @@ module.exports = {
   config: {
     name: "emojiVideo",
     version: "1.0.0",
-    author: "Replit Agent",
+    author: "alihsan shourov",
     category: "events"
   },
 
