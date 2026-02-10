@@ -32,7 +32,7 @@ module.exports = {
       if (event.messageReply?.senderID) {
         targetID = event.messageReply.senderID;
         targetName =
-          ((await usersData.get?(targetID))?.name || "Friend");
+          ((await usersData.get(targetID))?.name || "Friend");
       } else if (event.mentions && Object.keys(event.mentions).length > 0) {
         targetID = Object.keys(event.mentions)[0];
         targetName = event.mentions[targetID];
@@ -57,7 +57,7 @@ module.exports = {
 
       const huggerID = event.senderID;
       const huggerName =
-        ((await usersData.get?(huggerID))?.name || "Someone");
+        ((await usersData.get(huggerID))?.name || "Someone");
 
       /* ===== TMP DIR ===== */
       const tmpDir = path.join(__dirname, "tmp");

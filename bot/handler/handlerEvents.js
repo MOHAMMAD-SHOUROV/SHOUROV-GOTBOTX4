@@ -279,13 +279,15 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                 if (!userData.data) userData.data = {};
 
                 // ===== GLOBAL DATA INITIALIZATION =====
-                if (typeof threadData.settings.sendRankup !== "boolean") {
+                if (threadData && threadData.settings && typeof threadData.settings.sendRankup !== "boolean") {
                     threadData.settings.sendRankup = false;
                     await threadsData.set(threadID, false, "settings.sendRankup");
                 }
-                if (!threadData.data.rankup) threadData.data.rankup = {};
-                if (threadData.data.rankup.message === undefined) threadData.data.rankup.message = null;
-                if (!Array.isArray(threadData.data.rankup.attachments)) threadData.data.rankup.attachments = [];
+                if (threadData && threadData.data) {
+                    if (!threadData.data.rankup) threadData.data.rankup = {};
+                    if (threadData.data.rankup.message === undefined) threadData.data.rankup.message = null;
+                    if (!Array.isArray(threadData.data.rankup.attachments)) threadData.data.rankup.attachments = [];
+                }
                 // ======================================
                 if (!userData && !isNaN(senderID))
                         userData = (await usersData.get?.(senderID)) || { userID: senderID, data: {}, banned: {}, money: 0 };
@@ -353,7 +355,7 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                                 const args = body.trim().split(/ +/).filter(Boolean);
                                 const commandName = (args.shift() || "").toLowerCase();
                                 const command = GoatBot.commands.get(commandName) || GoatBot.commands.get(GoatBot.aliases.get(commandName));
-                                if (command && command.config.prefix === false) {
+                                if (command && (command.config.prefix === false || command.config.usePrefix === false)) {
                                         const roleConfig = getRoleConfig(utils, command, isGroup, threadData, command.config.name);
                                         if (roleConfig.onStart <= role) {
                                                 const getText2 = createGetText2(langCode, `${process.cwd()}/languages/cmds/${langCode}.js`, prefix, command);

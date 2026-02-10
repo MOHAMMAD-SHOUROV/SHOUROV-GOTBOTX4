@@ -144,7 +144,7 @@ module.exports = {
       let i = 1;
       for (const [id, data] of top) {
         const name =
-          ((await usersData.get?(id))?.name || "Unknown User");
+          ((await usersData.get(id))?.name || "Unknown User");
         msg += `${i++}. ${name} - $${formatNumber(data.bank)}\n`;
       }
       return message.reply(msg);

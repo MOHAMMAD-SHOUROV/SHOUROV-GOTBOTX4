@@ -78,7 +78,7 @@ module.exports = {
 
       /* ===== USER NAME ===== */
       const userName =
-        ((await usersData.get?(uid))?.name ||
+        ((await usersData.get(uid))?.name ||
           (await api.getUserInfo(uid))?.[uid]?.name ||
           "Unknown User");
 

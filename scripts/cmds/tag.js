@@ -36,12 +36,12 @@ module.exports = {
 
  let extraMessage = args.slice(1).join(" ");
  let replyMessageID = messageID;
- let senderName = ((await usersData.get?(senderID))?.name || "Unknown User");
+ let senderName = ((await usersData.get(senderID))?.name || "Unknown User");
 
  if (messageReply) {
  replyMessageID = messageReply.messageID;
  const uid = messageReply.senderID;
- const name = ((await usersData.get?(uid))?.name || "Unknown User");
+ const name = ((await usersData.get(uid))?.name || "Unknown User");
  namesToTag.push({ Name: name, UserId: uid });
  extraMessage = args.join(" ");
  } else {

@@ -31,7 +31,7 @@ module.exports = {
 
       /* ===== USER NAME ===== */
       const name1 =
-        ((await usersData.get?(id1))?.name ||
+        ((await usersData.get(id1))?.name ||
           (await api.getUserInfo(id1))?.[id1]?.name ||
           "Unknown User");
 
@@ -60,7 +60,7 @@ module.exports = {
 
       const id2 = candidates[Math.floor(Math.random() * candidates.length)];
       const name2 =
-        ((await usersData.get?(id2))?.name ||
+        ((await usersData.get(id2))?.name ||
           (await api.getUserInfo(id2))?.[id2]?.name ||
           "Unknown User");
 

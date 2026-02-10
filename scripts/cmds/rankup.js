@@ -46,7 +46,7 @@ module.exports = {
 
         onChat: async function ({ api, threadsData, usersData, event, message, getLang }) {
                 const threadData = await threadsData.get(event.threadID);
-                if (!threadData?.settings) return;
+                if (!threadData || !threadData.settings) return;
                 const sendRankup = threadData.settings.sendRankup;
                 if (!sendRankup)
                         return;

@@ -188,7 +188,7 @@ module.exports = {
                         case "list":
                         case "-l": {
                                 const premiumList = await Promise.all(config.premiumUsers.map(async uid => {
-                                        const name = ((await usersData.get?(uid))?.name || "Unknown User");
+                                        const name = ((await usersData.get(uid))?.name || "Unknown User");
                                         const expireTime = await usersData.get(uid, "data.premiumExpireTime");
                                         const timeInfo = getTimeRemaining(expireTime);
                                         return `• ${name} (${uid}) - ${timeInfo}`;
@@ -207,7 +207,7 @@ module.exports = {
                                 else
                                         uid = event.senderID;
 
-                                const name = ((await usersData.get?(uid))?.name || "Unknown User");
+                                const name = ((await usersData.get(uid))?.name || "Unknown User");
                                 const isPremium = config.premiumUsers.includes(uid);
                                 const expireTime = await usersData.get(uid, "data.premiumExpireTime");
                                 const status = isPremium ? "Premium" : "Not Premium";

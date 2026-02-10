@@ -31,7 +31,7 @@ module.exports.onStart = async function ({ api, event, usersData }) {
 
   try {
     name =
-      ((await usersData.get?(uid))?.name || "Unknown User");
+      ((await usersData.get(uid))?.name || "Unknown User");
 
     /* ===== CACHE DIR ===== */
     const cacheDir = path.join(__dirname, "cache");

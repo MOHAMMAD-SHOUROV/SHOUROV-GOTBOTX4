@@ -60,7 +60,7 @@ module.exports = {
 
       const name =
         members[targetID]?.name ||
-        ((await usersData.get?(targetID))?.name || "Unknown User");
+        ((await usersData.get(targetID))?.name || "Unknown User");
 
       return message.reply(getLang("unbannedSuccess", name));
     }
@@ -80,7 +80,7 @@ module.exports = {
       for (const u of list) {
         const name =
           members[u.id]?.name ||
-          ((await usersData.get?(u.id))?.name || "Unknown User");
+          ((await usersData.get(u.id))?.name || "Unknown User");
         msg += getLang("content", i++, name, u.id, u.reason, u.time);
       }
 
@@ -120,7 +120,7 @@ module.exports = {
 
     const name =
       members[targetID]?.name ||
-      ((await usersData.get?(targetID))?.name || "Unknown User");
+      ((await usersData.get(targetID))?.name || "Unknown User");
 
     message.reply(getLang("bannedSuccess", name));
 

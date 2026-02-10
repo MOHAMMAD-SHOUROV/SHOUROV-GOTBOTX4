@@ -26,17 +26,13 @@ module.exports = {
     const query = args.join(" ");
 
     try {
-      // ===== LOAD API CONFIG =====
-      const { data } = await axios.get(
-        "https://raw.githubusercontent.com/MOHAMMAD-NAYAN-07/Nayan/main/api.json"
-      );
-      const apiUrl = data.sim;   // sim api
-      const apiUrl2 = data.api2; // font api
+      const apiUrl = "https://simsimi.fun/api/v2/"; // Hardcoded stable API as fallback
+      const apiUrl2 = "https://api.v7.io/"; // Hardcoded font API
 
       const userName = (await usersData.getName(senderID)) || "User";
 
       // ================= NO QUERY (GREETING) =================
-      if (!query) {
+      if (!query || ["hi", "hello", "hey", "bot"].includes(query.toLowerCase())) {
         const greetings = [
           "আহ শুনা আমার তোমার অলিতে গলিতে উম্মাহ 😇😘",
           "কি গো সোনা আমাকে ডাকছ কেনো",
@@ -198,7 +194,9 @@ module.exports = {
 
     } catch (err) {
       console.error("BOT ERROR:", err);
-      api.sendMessage("⚠️ Something went wrong, try later.", threadID, messageID);
+      if (query) {
+         api.sendMessage(`「 ${userName} 」\nহুম জান বলো কি বলবা?`, threadID, messageID);
+      }
     }
   },
 
