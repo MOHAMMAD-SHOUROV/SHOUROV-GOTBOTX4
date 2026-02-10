@@ -1,37 +1,36 @@
 # GoatBot V2
 
 ## Overview
-GoatBot V2 is a Facebook Messenger chatbot built with Node.js. It uses a personal Facebook account to operate as a chat bot with various commands and features. Originally created by NTKhang, modified by Alihsan Shourov.
+GoatBot V2 is a Facebook Messenger chatbot built with Node.js. It uses a personal Facebook account to operate as a bot with various commands and features.
 
-## Current State
-- Project is imported and running
-- Node.js 20 runtime
-- Dependencies installed via npm
+- **Version**: 1.5.35
+- **Author**: NTKhang (Modified by NeoKEX)
+- **Runtime**: Node.js v20
+- **Bot Name**: SHOUROV-BOT
+- **Prefix**: /
 
 ## Project Architecture
-- **Entry point**: `index.js` - spawns `Shourov.js` as child process with auto-restart on exit code 2
-- **Main bot logic**: `Shourov.js` - core bot initialization, Facebook login, command loading
-- **Bot commands**: `scripts/cmds/` - individual command files
-- **Bot events**: `scripts/events/` - event handler files
-- **Dashboard**: `dashboard/` - web dashboard for bot management
-- **Languages**: `languages/` - i18n language files
-- **Logger**: `logger/` - logging utilities
-- **Utils**: `utils.js` - utility functions
-- **Config**: `configCommands.json`, `fca-config.json` - bot configuration
-
-## Key Dependencies
-- `shourov-fca` - Facebook Chat API
-- `express` - Web server for dashboard
-- `mongoose` - MongoDB driver
-- `sqlite3` / `sequelize` - SQLite database
-- `canvas` - Image generation
-- `axios` - HTTP requests
-- `socket.io` - WebSocket support
-
-## Workflows
-- **GoatBot Server**: `npm start` - Runs the bot (console output)
+- `index.js` - Main entry point
+- `Shourov.js` - Bot login and initialization
+- `bot/` - Core bot logic (login, handler)
+- `scripts/cmds/` - Bot command scripts
+- `scripts/events/` - Bot event handlers
+- `database/` - Database controllers and models (SQLite)
+- `languages/` - Localization files (cmds, events)
+- `logger/` - Logging utilities
+- `dashboard/` - Web dashboard (served on port 5000)
 
 ## Recent Changes
-- 2026-02-09: Replaced fca-neokex with shourov-fca and updated database references to shourov_fca_database.
-- 2026-02-08: Completed import migration - all packages installed, workflow configured and verified running
-- 2026-02-07: Initial import to Replit environment, installed system dependencies (cairo, pango, etc.) for canvas support
+- 2026-02-10: Initial import to Replit environment
+  - Installed all npm dependencies
+  - Fixed directory naming issues (trailing spaces in folder names)
+  - Server running successfully on port 5000
+  - SQLite database connected, commands loading
+
+## Workflow
+- **GoatBot Server**: `npm start` - Runs the bot and web dashboard on port 5000
+
+## Notes
+- The bot requires Facebook cookies/appstate for login (configured in account files)
+- Auto refresh cookie mode requires email/password in config.json
+- Dashboard accessible via the web preview on port 5000
