@@ -15,7 +15,7 @@ module.exports = {
 
     // Mapping of text/emoji to video filename
     const mapping = {
-      "king": "funny.mp4",
+      "king": "cover.mp4",
       "🔥": "fire.mp4"
     };
 
