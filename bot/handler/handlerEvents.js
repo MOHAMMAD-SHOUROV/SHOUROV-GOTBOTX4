@@ -348,6 +348,32 @@ module.exports = function (api, threadModel, userModel, dashBoardModel, globalMo
                 */
                 let isUserCallCommand = false;
                 async function onStart() {
+                        // —————————————— CHECK NO PREFIX COMMAND —————————————— //
+                        if (!body.startsWith(prefix)) {
+                                const args = body.trim().split(/ +/).filter(Boolean);
+                                const commandName = (args.shift() || "").toLowerCase();
+                                const command = GoatBot.commands.get(commandName) || GoatBot.commands.get(GoatBot.aliases.get(commandName));
+                                if (command && command.config.prefix === false) {
+                                        const roleConfig = getRoleConfig(utils, command, isGroup, threadData, command.config.name);
+                                        if (roleConfig.onStart <= role) {
+                                                const getText2 = createGetText2(langCode, `${process.cwd()}/languages/cmds/${langCode}.js`, prefix, command);
+                                                try {
+                                                        await command.onStart({
+                                                                ...parameters,
+                                                                args,
+                                                                commandName: command.config.name,
+                                                                getLang: getText2,
+                                                                removeCommandNameFromBody: (b, p, c) => b.replace(new RegExp(`^(\\s+|)${c}`, "i"), "").trim()
+                                                        });
+                                                        log.info("CALL COMMAND", `${command.config.name} (no prefix) | ${userData.name} | ${senderID} | ${threadID} | ${args.join(" ")}`);
+                                                        return;
+                                                } catch (err) {
+                                                        log.err("CALL COMMAND", `An error occurred when calling the no-prefix command ${command.config.name}`, err);
+                                                }
+                                        }
+                                }
+                        }
+
                         // —————————————— CHECK USE BOT —————————————— //
                         const botID = api.getCurrentUserID();
                         let isMentioned = false;
