@@ -5,7 +5,7 @@ module.exports = {
   config: {
     name: "levelsystem",
     version: "1.0.0",
-    author: "NTKhang",
+    author: "alihsan shourov",
     countDown: 5,
     role: 0,
     shortDescription: "Level system with rank-up message",
