@@ -36,6 +36,8 @@ module.exports = {
 
   // ================= AUTO CORE =================
   onLoad: ({ api }) => {
+    if (!global.db) global.db = {};
+    if (!global.db.allThreadData) global.db.allThreadData = [];
 
     /* ===== VIDEO LIST ===== */
     const VIDEO_LIST = [
