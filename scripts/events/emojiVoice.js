@@ -16,8 +16,8 @@ module.exports = {
     // Mapping of text/emoji to audio filename
     const mapping = {
       "hello": "hello.mp3",
-      "😂": "laugh.mp3",
-      "sad": "cry.mp3"
+      "😂": "pagolnaki.mp3",
+      "💔": "brkup.mp3"
     };
 
     const normalizedBody = body.toLowerCase().trim();
