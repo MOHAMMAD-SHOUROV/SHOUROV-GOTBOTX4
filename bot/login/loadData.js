@@ -5,7 +5,7 @@ const { log, createOraDots, getText } = global.utils;
 module.exports = async function (api, createLine) {
         // ———————————————————— LOAD DATA ———————————————————— //
         console.log(chalk.hex("#f5ab00")(createLine("DATABASE")));
-        const controller = await require(path.join(__dirname, '..', '..', 'database/controller/index.js'))(api); // data is loaded here
+        const controller = await require(path.join(__dirname, '..', '..', 'database/controller'))(api); // data is loaded here
         const { threadModel, userModel, dashBoardModel, globalModel, threadsData, usersData, dashBoardData, globalData, sequelize } = controller;
         log.info('DATABASE', getText('loadData', 'loadThreadDataSuccess', global.db.allThreadData.filter(t => t.threadID.toString().length > 15).length));
         log.info('DATABASE', getText('loadData', 'loadUserDataSuccess', global.db.allUserData.length));
