@@ -80,7 +80,7 @@ const titles = [
                 "G O A T B O T  V 2 @" + currentVersion
         ],
         [
-                "SHOUROV-GOTBOTX4 V2"
+                "GOATBOT V2"
         ]
 ];
 const maxWidth = process.stdout.columns;
@@ -113,8 +113,8 @@ else {
         subTitleArray.push(subTitle);
 }
 const author = ("Created by NTKhang with ♡");
-const modified = ("Modified by Alihsan Shourov");
-const srcUrl = ("Source code: https://github.com/MOHAMMAD-SHOUROV/SHOUROV-GOTBOTX4");
+const modified = ("Modified by NeoKEX");
+const srcUrl = ("Source code: https://github.com/ntkhang03/Goat-Bot-V2");
 const fakeRelease = ("ALL VERSIONS NOT RELEASED HERE ARE FAKE");
 for (const t of subTitleArray) {
         const textColor2 = gradient("#9F98E8", "#AFF6CF")(t);
@@ -256,13 +256,13 @@ async function getAppStateFromEmail(spin = { _start: () => { }, _stop: () => { }
                                 await (async function submitCode(message) {
                                         if (message && isExit) {
                                                 spin._stop();
-                                                log.error("SHOUROV-BOT LOGIN FACEBOOK", message);
+                                                log.error("LOGIN FACEBOOK", message);
                                                 process.exit();
                                         }
 
                                         if (message) {
                                                 spin._stop();
-                                                log.warn("SHOUROV-BOT LOGIN FACEBOOK", message);
+                                                log.warn("LOGIN FACEBOOK", message);
                                         }
 
                                         if (facebookAccount["2FASecret"] && tryNumber == 0) {
@@ -403,7 +403,7 @@ async function getAppStateToLogin(loginWithEmail) {
         if (loginWithEmail)
                 return await getAppStateFromEmail(undefined, facebookAccount);
         if (!existsSync(dirAccount))
-                return log.error("SHOUROV-BOT LOGIN FACEBOOK", getText('login', 'notFoundDirAccount', colors.green(dirAccount)));
+                return log.error("LOGIN FACEBOOK", getText('login', 'notFoundDirAccount', colors.green(dirAccount)));
         const accountText = readFileSync(dirAccount, "utf8");
 
         try {
@@ -501,18 +501,18 @@ async function getAppStateToLogin(loginWithEmail) {
                         email,
                         password
                 } = facebookAccount;
-                if (err.name === "SHOUROV-BOT TOKEN_ERROR")
-                        log.err("SHOUROV-BOT LOGIN FACEBOOK", getText('login', 'tokenError', colors.green("EAAAA..."), colors.green(dirAccount)));
-                else if (err.name === "SHOUROV-BOT COOKIE_INVALID")
-                        log.err("SHOUROV-BOT LOGIN FACEBOOK", getText('login', 'cookieError'));
-                else if (err.name === "SHOUROV-BOT CHECKPOINT_ERROR") {
-                        log.err("SHOUROV-BOT LOGIN FACEBOOK", colors.red(err.message));
-                        log.warn("SHOUROV-BOT LOGIN FACEBOOK", "You must complete the Facebook checkpoint process before the bot can login.");
-                        log.warn("SHOUROV-BOTLOGIN FACEBOOK", "After completing the checkpoint, export fresh cookies or add your email/password to config.json");
+                if (err.name === "TOKEN_ERROR")
+                        log.err("LOGIN FACEBOOK", getText('login', 'tokenError', colors.green("EAAAA..."), colors.green(dirAccount)));
+                else if (err.name === "COOKIE_INVALID")
+                        log.err("LOGIN FACEBOOK", getText('login', 'cookieError'));
+                else if (err.name === "CHECKPOINT_ERROR") {
+                        log.err("LOGIN FACEBOOK", colors.red(err.message));
+                        log.warn("LOGIN FACEBOOK", "You must complete the Facebook checkpoint process before the bot can login.");
+                        log.warn("LOGIN FACEBOOK", "After completing the checkpoint, export fresh cookies or add your email/password to config.json");
                 }
 
                 if (!email || !password) {
-                        log.warn("SHOUROV-BOT LOGIN FACEBOOK", getText('login', 'cannotFindAccount'));
+                        log.warn("LOGIN FACEBOOK", getText('login', 'cannotFindAccount'));
                         const rl = readline.createInterface({
                                 input: process.stdin,
                                 output: process.stdout
@@ -667,10 +667,10 @@ async function startBot(loginWithEmail) {
                         if (!isNaN(facebookAccount.intervalGetNewCookie) && facebookAccount.intervalGetNewCookie > 0)
                                 if (facebookAccount.email && facebookAccount.password) {
                                         spin?._stop();
-                                        log.info("SHOUROV-BOT REFRESH COOKIE", getText('login', 'refreshCookieAfter', convertTime(facebookAccount.intervalGetNewCookie * 60 * 1000, true)));
+                                        log.info("REFRESH COOKIE", getText('login', 'refreshCookieAfter', convertTime(facebookAccount.intervalGetNewCookie * 60 * 1000, true)));
                                         setTimeout(async function refreshCookie() {
                                                 try {
-                                                        log.info("SHOUROV-BOT REFRESH COOKIE", getText('login', 'refreshCookie'));
+                                                        log.info("REFRESH COOKIE", getText('login', 'refreshCookie'));
                                                         const appState = await getAppStateFromEmail(undefined, facebookAccount);
                                                         if (facebookAccount.i_user)
                                                                 pushI_user(appState, facebookAccount.i_user);
@@ -681,7 +681,7 @@ async function startBot(loginWithEmail) {
                                                         return startBot(appState);
                                                 }
                                                 catch (err) {
-                                                        log.err("SHOUROV-BOT REFRESH COOKIE", getText('login', 'refreshCookieError'), err.message, err);
+                                                        log.err("REFRESH COOKIE", getText('login', 'refreshCookieError'), err.message, err);
                                                         setTimeout(refreshCookie, facebookAccount.intervalGetNewCookie * 60 * 1000);
                                                 }
                                         }, facebookAccount.intervalGetNewCookie * 60 * 1000);
@@ -694,7 +694,7 @@ async function startBot(loginWithEmail) {
 
                         // Handle error
                         if (error) {
-                                log.err("SHOUROV-BOT LOGIN FACEBOOK", getText('login', 'loginError'), error);
+                                log.err("LOGIN FACEBOOK", getText('login', 'loginError'), error);
                                 global.statusAccountBot = 'can\'t login';
                                 if (facebookAccount.email && facebookAccount.password) {
                                         return startBot(true);
@@ -703,10 +703,10 @@ async function startBot(loginWithEmail) {
                                 if (global.GoatBot.config.dashBoard?.enable == true) {
                                         try {
                                                 await require("../../dashboard/app.js")(null);
-                                                log.info("SHOUROV-BOT DASHBOARD", getText('login', 'openDashboardSuccess'));
+                                                log.info("DASHBOARD", getText('login', 'openDashboardSuccess'));
                                         }
                                         catch (err) {
-                                                log.err("SHOUROV-BOT DASHBOARD", getText('login', 'openDashboardError'), err);
+                                                log.err("DASHBOARD", getText('login', 'openDashboardError'), err);
                                         }
                                         return;
                                 }
@@ -717,16 +717,16 @@ async function startBot(loginWithEmail) {
 
                         global.GoatBot.fcaApi = api;
                         global.GoatBot.botID = api.getCurrentUserID();
-                        log.info("SHOUROV-BOT LOGIN FACEBOOK", getText('login', 'loginSuccess'));
+                        log.info("LOGIN FACEBOOK", getText('login', 'loginSuccess'));
                         let hasBanned = false;
                         global.botID = api.getCurrentUserID();
                         logColor("#f5ab00", createLine("BOT INFO"));
-                        log.info("SHOUROV-BOT NODE VERSION", process.version);
-                        log.info("SHOUROV-BOT PROJECT VERSION", currentVersion);
-                        log.info("SHOUROV-BOT BOT ID", `${global.botID} - ${await getName(global.botID)}`);
-                        log.info("SHOUROV-BOT PREFIX", global.GoatBot.config.prefix);
-                        log.info("SHOUROV-BOT LANGUAGE", global.GoatBot.config.language);
-                        log.info("SHOUROV-BOT BOT NICK NAME", global.GoatBot.config.nickNameBot || "GOAT BOT");
+                        log.info("NODE VERSION", process.version);
+                        log.info("PROJECT VERSION", currentVersion);
+                        log.info("BOT ID", `${global.botID} - ${await getName(global.botID)}`);
+                        log.info("PREFIX", global.GoatBot.config.prefix);
+                        log.info("LANGUAGE", global.GoatBot.config.language);
+                        log.info("BOT NICK NAME", global.GoatBot.config.nickNameBot || "GOAT BOT");
                         // ———————————————————— GBAN ————————————————————— //
                         let dataGban;
 
@@ -788,10 +788,10 @@ async function startBot(loginWithEmail) {
                                 changeFbStateByCode = true;
                                 try {
                                         writeFileSync(dirAccount, JSON.stringify(filterKeysAppState(api.getAppState()), null, 2));
-                                        log.info("SHOUROV-BOT REFRESH FBSTATE", getText('login', 'refreshFbstateSuccess', path.basename(dirAccount)));
+                                        log.info("REFRESH FBSTATE", getText('login', 'refreshFbstateSuccess', path.basename(dirAccount)));
                                 }
                                 catch (err) {
-                                        log.warn("SHOUROV-BOT REFRESH FBSTATE", getText('login', 'refreshFbstateError', path.basename(dirAccount)), err);
+                                        log.warn("REFRESH FBSTATE", getText('login', 'refreshFbstateError', path.basename(dirAccount)), err);
                                 }
                                 setTimeout(() => changeFbStateByCode = false, 1000);
                         }
@@ -867,11 +867,11 @@ async function startBot(loginWithEmail) {
                                 logColor('#f5ab00', createLine('DASHBOARD'));
                                 try {
                                         await require("../../dashboard/app.js")(api);
-                                        log.info("SHOUROV-BOT DASHBOARD", getText('login', 'openDashboardSuccess'));
+                                        log.info("DASHBOARD", getText('login', 'openDashboardSuccess'));
                                         dashBoardIsRunning = true;
                                 }
                                 catch (err) {
-                                        log.err("SHOUROV-BOT DASHBOARD", getText('login', 'openDashboardError'), err);
+                                        log.err("DASHBOARD", getText('login', 'openDashboardError'), err);
                                 }
                         }
                         // ———————————————————— ADMIN BOT ———————————————————— //
@@ -882,16 +882,11 @@ async function startBot(loginWithEmail) {
                                 .map(item => item = item.toString());
                         for (const uid of adminBot) {
                                 try {
-                                        let userName = "Unknown User";
-
-if (usersData && typeof usersData.get === "function") {
-  const user = await usersData.get(uid);
-  if (user && user.name) userName = user.name;
-}
-                                        log.master("SHOUROV-BOT ADMINBOT", `[${++i}] ${uid} | ${userName}`);
+                                        const userName = await usersData.getName(uid);
+                                        log.master("ADMINBOT", `[${++i}] ${uid} | ${userName}`);
                                 }
                                 catch (e) {
-                                        log.master("SHOUROV-BOT ADMINBOT", `[${++i}] ${uid}`);
+                                        log.master("ADMINBOT", `[${++i}] ${uid}`);
                                 }
                         }
                         log.master("NOTIFICATION", (notification || "").trim());
