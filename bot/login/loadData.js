@@ -78,8 +78,11 @@ module.exports = async function (api, createLine) {
                         spin._start();
                         const threadDataWillSet = [];
                         const allThreadData = [...global.db.allThreadData];
-                        let allThreadInfo = await api.getThreadList(9999999, null, 'INBOX');
-                        allThreadInfo = allThreadInfo.filter(thread => thread && thread.threadID);
+                        api.getThreadList(9999999, null, 'INBOX')
+  .then(allThreadInfo => {
+      // existing code here
+  })
+  .catch(err => console.error(err));
                         for (const threadInfo of allThreadInfo) {
                                 if (threadInfo.isGroup && !allThreadData.some(thread => thread.threadID === threadInfo.threadID))
                                         threadDataWillSet.push(await threadsData.create(threadInfo.threadID, threadInfo));
